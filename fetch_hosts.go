@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/h2non/filetype"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"io"
 	"net"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 const (
@@ -57,110 +57,6 @@ func startClient(ticker *FetchTicker, url string, flog *FetchLog) {
 	}
 }
 
-func startServer(ticker *FetchTicker, port int, flog *FetchLog) {
-	listen, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		flog.Print(tfs(&i18n.Message{
-			ID:    "ServerStartErrorLog",
-			Other: "服务启动失败（可能是目标端口已被占用）：{{.E}}",
-		}, map[string]interface{}{
-			"E": err.Error(),
-		}))
-		return
-	}
-	flog.Print(tfs(&i18n.Message{
-		ID:    "ServerStartSuccessLog",
-		Other: "已监听HTTP服务成功：http://127.0.0.1:{{.Port}}",
-	}, map[string]interface{}{
-		"Port": port,
-	}))
-	flog.Print(tfs(&i18n.Message{
-		ID:    "ServerStartSuccessHostsLinkLog",
-		Other: "hosts文件链接：http://127.0.0.1:{{.Port}}/hosts.txt",
-	}, map[string]interface{}{
-		"Port": port,
-	}))
-	flog.Print(tfs(&i18n.Message{
-		ID:    "ServerStartSuccessHostsJsonLinkLog",
-		Other: "hosts的JSON格式链接：http://127.0.0.1:{{.Port}}/hosts.json",
-	}, map[string]interface{}{
-		"Port": port,
-	}))
-	go http.Serve(listen, &serverHandle{flog})
-	fn := func() {
-		if err := ServerFetchHosts(); err != nil {
-			flog.Print(tfs(&i18n.Message{
-				ID:    "ServerFetchHostsErrorLog",
-				Other: "执行更新Github-Hosts失败：{{.E}}",
-			}, map[string]interface{}{
-				"E": err.Error(),
-			}))
-		} else {
-			flog.Print(t(&i18n.Message{
-				ID:    "ServerFetchHostsSuccessLog",
-				Other: "执行更新Github-Hosts成功！",
-			}))
-		}
-	}
-	fn()
-	for {
-		select {
-		case <-ticker.Ticker.C:
-			fn()
-		case <-ticker.CloseChan:
-			flog.Print(t(&i18n.Message{
-				ID:    "ServerFetchHostsStopLog",
-				Other: "正在停止更新hosts服务",
-			}))
-			if err := listen.Close(); err != nil {
-				flog.Print(t(&i18n.Message{
-					ID:    "ServerFetchHostsStopErrorLog",
-					Other: "关闭端口监听失败",
-				}))
-			}
-			flog.Print(t(&i18n.Message{
-				ID:    "ServerFetchHostsStopSuccessLog",
-				Other: "已停止更新hosts服务",
-			}))
-			return
-		}
-	}
-}
-
-type serverHandle struct {
-	flog *FetchLog
-}
-
-func (s *serverHandle) ServeHTTP(resp http.ResponseWriter, request *http.Request) {
-	p := request.URL.Path
-	if p == "/" || p == "/hosts.txt" || p == "/hosts.json" {
-		if p == "/" {
-			p = "/index.html"
-		}
-		file, err := os.ReadFile(AppExecDir() + p)
-		if err != nil {
-			resp.WriteHeader(http.StatusInternalServerError)
-			resp.Write([]byte("server error"))
-			s.flog.Print(tfs(&i18n.Message{
-				ID:    "ServerFetchIndexFileErr",
-				Other: "获取首页文件失败：{{.E}}",
-			}, map[string]interface{}{
-				"E": err.Error(),
-			}))
-			return
-		}
-		resp.Write(file)
-		return
-	}
-	if strings.HasPrefix(p, "/public/") {
-		file, _ := assetsFs.ReadFile("assets" + p)
-		kind, _ := filetype.Match(file)
-		resp.Header().Set("Content-Type", kind.MIME.Value)
-		resp.Write(file)
-		return
-	}
-	http.Redirect(resp, request, "/", http.StatusMovedPermanently)
-}
 
 // ClientFetchHosts 获取最新的host并写入hosts文件
 func ClientFetchHosts(url string) (err error) {
@@ -205,61 +101,6 @@ func ClientFetchHosts(url string) (err error) {
 		err = ComposeError(t(&i18n.Message{
 			ID:    "WriteHostsNoPermission",
 			Other: "写入hosts文件失败，请用超级管理员身份启动本程序！",
-		}), err)
-		return
-	}
-
-	return
-}
-
-// ServerFetchHosts 服务端获取github最新的hosts并写入到对应文件及更新首页
-func ServerFetchHosts() (err error) {
-	execDir := AppExecDir()
-	domains, err := getGithubDomains()
-	if err != nil {
-		return
-	}
-
-	hostJson, hostFile, now, err := FetchHosts(domains)
-	if err != nil {
-		err = ComposeError(t(&i18n.Message{
-			ID:    "FetchGithubHostsFail",
-			Other: "获取Github的Host失败",
-		}), err)
-		return
-	}
-
-	if err = os.WriteFile(execDir+"/hosts.json", hostJson, 0775); err != nil {
-		err = ComposeError(t(&i18n.Message{
-			ID:    "WriteHostsJsonFileErr",
-			Other: "写入数据到hosts.json文件失败",
-		}), err)
-		return
-	}
-
-	if err = os.WriteFile(execDir+"/hosts.txt", hostFile, 0775); err != nil {
-		err = ComposeError(t(&i18n.Message{
-			ID:    "WriteHostsTxtFileErr",
-			Other: "写入数据到hosts.txt文件失败",
-		}), err)
-		return
-	}
-
-	var templateFile []byte
-	templateFile, err = GetExecOrEmbedFile(&assetsFs, "assets/index.html")
-	if err != nil {
-		err = ComposeError(t(&i18n.Message{
-			ID:    "ReadIndexFileErr",
-			Other: "读取首页模板文件失败",
-		}), err)
-		return
-	}
-
-	templateData := strings.Replace(string(templateFile), "<!--time-->", now, 1)
-	if err = os.WriteFile(execDir+"/index.html", []byte(templateData), 0775); err != nil {
-		err = ComposeError(t(&i18n.Message{
-			ID:    "WriteIndexFileErr",
-			Other: "写入更新信息到首页文件失败",
 		}), err)
 		return
 	}

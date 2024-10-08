@@ -5,7 +5,6 @@ go 1.18
 require (
 	fyne.io/fyne/v2 v2.4.3
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
-	github.com/h2non/filetype v1.1.3
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/nicksnyder/go-i18n/v2 v2.3.0
 	github.com/pelletier/go-toml/v2 v2.1.0
@@ -29,7 +28,8 @@ require (
 	github.com/getlantern/hex v0.0.0-20220104173244-ad7e4b9194dc // indirect
 	github.com/getlantern/hidden v0.0.0-20220104173330-f221c5a24770 // indirect
 	github.com/getlantern/ops v0.0.0-20230519221840-1283e026181c // indirect
-	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
+	github.com/go-gl/gl v0.0.0-20231021071112-07e5d0ea2e71 // indirect
+	github.com/go-gl/glfw v0.0.0-20240506104042-037f3cc74f2a // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

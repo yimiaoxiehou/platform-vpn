@@ -3,12 +3,13 @@ package main
 import (
 	"embed"
 	"fmt"
+	"os"
+	"runtime"
+
 	"github.com/getlantern/elevate"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/pelletier/go-toml/v2"
 	"golang.org/x/text/language"
-	"os"
-	"runtime"
 )
 
 //go:embed assets
@@ -53,9 +54,5 @@ func bootCli(args *CmdArgs) {
 	_cliLog.Print("可以将此程序注册为服务，具体请参考项目说明：https://github.com/Licoy/fetch-github-hosts")
 
 	ticker := NewFetchTicker(args.FetchInterval)
-	if args.Mode == "server" {
-		startServer(ticker, args.Port, _cliLog)
-	} else {
-		startClient(ticker, args.Url, _cliLog)
-	}
+	startClient(ticker, args.Url, _cliLog)
 }

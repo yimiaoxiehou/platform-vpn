@@ -6,28 +6,20 @@ import (
 
 type FetchConf struct {
 	Lang   string
-	Client struct {
-		Interval     int
-		Method       string
-		SelectOrigin string
-		CustomUrl    string
-		AutoFetch    bool
-	}
-	Server struct {
-		Interval int
-		Port     int
-	}
+	Interval     int
+	Method       string
+	SelectOrigin string
+	CustomUrl    string
+	AutoFetch    bool
 }
 
 func (f *FetchConf) Storage() {
 	viper.Set("lang", f.Lang)
-	viper.Set("client.interval", f.Client.Interval)
-	viper.Set("client.method", f.Client.Method)
-	viper.Set("client.selectorigin", f.Client.SelectOrigin)
-	viper.Set("client.customurl", f.Client.CustomUrl)
-	viper.Set("client.autofetch", f.Client.AutoFetch)
-	viper.Set("server.interval", f.Server.Interval)
-	viper.Set("server.port", f.Server.Port)
+	viper.Set("interval", f.Interval)
+	viper.Set("method", f.Method)
+	viper.Set("selectorigin", f.SelectOrigin)
+	viper.Set("customurl", f.CustomUrl)
+	viper.Set("autofetch", f.AutoFetch)
 	if err := viper.WriteConfigAs("conf.yaml"); err != nil {
 		_fileLog.Print("持久化配置信息失败：" + err.Error())
 	}
@@ -38,12 +30,10 @@ func LoadFetchConf() *FetchConf {
 	viper.SetConfigName("conf")
 	viper.SetConfigType("yaml")
 	viper.SetDefault("lang", "zh-CN")
-	viper.SetDefault("client.interval", 60)
-	viper.SetDefault("client.method", "官方指定hosts源")
-	viper.SetDefault("client.selectorigin", "FetchGithubHosts")
-	viper.SetDefault("client.autofetch", false)
-	viper.SetDefault("server.interval", 60)
-	viper.SetDefault("server.port", 9898)
+	viper.SetDefault("interval", 60)
+	viper.SetDefault("method", "官方指定hosts源")
+	viper.SetDefault("selectorigin", "FetchGithubHosts")
+	viper.SetDefault("autofetch", false)
 	var fileNotExits bool
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
