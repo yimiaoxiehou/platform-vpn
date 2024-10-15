@@ -39,7 +39,7 @@ jobs:
           files: |
             LICENSE
             README.md
-            Fetch-Github-Hosts.app
+            Fetch-Platform-Hosts.app
           outPath: fetch-github-hosts_${{ env.RELEASE_VERSION }}_macOS_amd64.tar.gz
 
       - name: Release

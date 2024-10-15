@@ -1,0 +1,62 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"path/filepath"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
+)
+
+var config *rest.Config
+
+func init() {
+	var err error
+	// 设置 kubeconfig 文件路径
+	home := homedir.HomeDir()
+	kubeconfig := filepath.Join(home, ".kube", "config")
+
+	// 使用 kubeconfig 创建 config
+	config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	if err != nil {
+		log.Fatalf("Error building kubeconfig: %v", err)
+	}
+
+}
+
+func getK8sHosts() (string, error) {
+	k8sHosts := "## Platform START\n"
+	// 创建 clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return k8sHosts, err
+	}
+	// 获取所有命名空间
+	namespaces, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return k8sHosts, err
+	}
+
+	// 遍历所有命名空间，获取服务
+	for _, ns := range namespaces.Items {
+		services, err := clientset.CoreV1().Services(ns.Name).List(context.TODO(), metav1.ListOptions{})
+		if err != nil {
+			log.Printf("Error listing services in namespace %s: %v", ns.Name, err)
+			continue
+		}
+
+		for _, svc := range services.Items {
+			if svc.Spec.ClusterIP == "None" {
+				continue
+			}
+			k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, svc.Name+"."+svc.Namespace+"."+"svc.cluster.local")
+		}
+	}
+	k8sHosts += "## Platform END\n"
+	return k8sHosts, nil
+}
