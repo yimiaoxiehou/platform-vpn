@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,17 +17,22 @@ import (
 var config *rest.Config
 
 func init() {
-	var err error
 	// 设置 kubeconfig 文件路径
 	home := homedir.HomeDir()
 	kubeconfig := filepath.Join(home, ".kube", "config")
 
-	// 使用 kubeconfig 创建 config
-	config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		log.Fatalf("Error building kubeconfig: %v", err)
+	// 检查 kubeconfig 文件是否存在
+	if _, err := os.Stat(kubeconfig); os.IsNotExist(err) {
+		// kubeconfig 文件不存在，尝试使用 in-cluster 配置		if err != nil {
+			log.Fatalf("kubeconfig 文件不存在: %v", err)
+		
+	} else {
+		// kubeconfig 文件存在，使用它创建 config
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			log.Fatalf("Error building kubeconfig: %v", err)
+		}
 	}
-
 }
 
 func getK8sHosts() (string, error) {

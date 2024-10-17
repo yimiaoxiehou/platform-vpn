@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"log"
 	"os"
 	"runtime"
 
@@ -21,6 +22,25 @@ var _cliLog = &FetchLog{w: os.Stdout}
 var _local *i18n.Localizer
 var _conf *FetchConf
 
+func init() {
+	// 设置日志文件
+	logFile, err := os.OpenFile(AppExecDir()+"/fetch.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
+	if err != nil {
+		_cliLog.Print(t(&i18n.Message{
+			ID:    "LogCreatedFail",
+			Other: "日志文件创建失败",
+		}))
+		return
+	}
+	defer logFile.Close()
+	// 设置日志输出到多重写入器
+	log.SetOutput(logFile)
+
+	// 可选：设置日志前缀和标志
+	log.SetPrefix("INFO: ")
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
+
 func main() {
 	args := ParseBootArgs()
 	if !args.DontEscalate && !args.Escalate && runtime.GOOS != Linux {
@@ -33,5 +53,6 @@ func main() {
 	bundle.LoadMessageFileFS(localeFS, "active.en-US.toml")
 	_conf = LoadFetchConf()
 	_local = i18n.NewLocalizer(bundle, args.Lang, _conf.Lang)
+
 	bootGui()
 }

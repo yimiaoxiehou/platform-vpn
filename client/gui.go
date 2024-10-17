@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"image/color"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -25,15 +24,6 @@ var _fileLog *FetchLog
 var engine core.Engine
 
 func bootGui() {
-	logFile, err := os.OpenFile(AppExecDir()+"/fetch.log", os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
-	if err != nil {
-		_cliLog.Print(t(&i18n.Message{
-			ID:    "LogCreatedFail",
-			Other: "日志文件创建失败",
-		}))
-		return
-	}
-	_fileLog = &FetchLog{w: logFile}
 	logoResource := getLogoResource()
 	a := app.New()
 	a.Settings().SetTheme(&fghGuiTheme{})
