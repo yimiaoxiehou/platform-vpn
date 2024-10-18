@@ -9,7 +9,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.4.1
 	github.com/pelletier/go-toml/v2 v2.2.3
 	github.com/spf13/viper v1.19.0
-	github.com/yimiaoxiehou/tun2socks v0.0.4
+	github.com/yimiaoxiehou/tun2socks v0.0.7
 	golang.org/x/text v0.19.0
 )
 

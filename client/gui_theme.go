@@ -1,9 +1,10 @@
 package main
 
 import (
+	"image/color"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
-	"image/color"
 )
 
 type fghGuiTheme struct {
@@ -20,22 +21,40 @@ func (f *fghGuiTheme) Font(s fyne.TextStyle) fyne.Resource {
 func (*fghGuiTheme) Color(c fyne.ThemeColorName, _ fyne.ThemeVariant) color.Color {
 	switch c {
 	case theme.ColorNamePrimary, theme.ColorNameButton:
-		//#009966
-		return color.RGBA{G: 0x99, B: 0x66, A: 0xff}
+		// 主要颜色和按钮颜色
+		// 使用深青色 (#008080)，比原来的颜色稍深，以在亮色背景上保持足够的对比度
+		return color.RGBA{R: 0x00, G: 0x80, B: 0x80, A: 0xff}
 	case theme.ColorNameBackground:
-		//#191b2c
-		return color.RGBA{R: 0x19, G: 0x1b, B: 0x2c, A: 0xff}
+		// 背景颜色
+		// 使用非常浅的灰色 (#F5F5F5)，接近白色但不刺眼
+		return color.RGBA{R: 0xF5, G: 0xF5, B: 0xF5, A: 0xff}
 	case theme.ColorNameMenuBackground, theme.ColorNameInputBackground, theme.ColorNameOverlayBackground:
-		//#1f2437
-		return color.RGBA{R: 0x1f, G: 0x24, B: 0x37, A: 0xff}
+		// 菜单背景、输入框背景和覆盖层背景颜色
+		// 使用白色 (#FFFFFF)，与主背景形成微妙区别
+		return color.RGBA{R: 0xFF, G: 0xFF, B: 0xFF, A: 0xff}
 	case theme.ColorNameDisabledButton:
-		//#629181
-		return color.RGBA{R: 0x62, G: 0x91, B: 0x81, A: 0xff}
+		// 禁用状态的按钮颜色
+		// 使用浅灰色 (#CCCCCC)
+		return color.RGBA{R: 0xCC, G: 0xCC, B: 0xCC, A: 0xff}
 	case theme.ColorNameDisabled:
-		//#34364a
-		return color.RGBA{R: 0x34, G: 0x36, B: 0x4a, A: 0xff}
+		// 禁用状态的一般元素颜色
+		// 使用中等灰色 (#999999)
+		return color.RGBA{R: 0x99, G: 0x99, B: 0x99, A: 0xff}
+	case theme.ColorNameForeground:
+		// 前景色（主要用于文本）
+		// 使用深灰色 (#333333)，在浅色背景上提供良好的可读性
+		return color.RGBA{R: 0x33, G: 0x33, B: 0x33, A: 0xff}
+	case theme.ColorNameHover:
+		// 悬停状态颜色
+		// 使用浅青色 (#E0F0F0)，与主题色调和
+		return color.RGBA{R: 0xE0, G: 0xF0, B: 0xF0, A: 0xff}
+	case theme.ColorNameSelection:
+		// 选中状态颜色
+		// 使用浅青绿色 (#B0E0E0)
+		return color.RGBA{R: 0xB0, G: 0xE0, B: 0xE0, A: 0xff}
 	default:
-		return theme.DefaultTheme().Color(c, theme.VariantDark)
+		// 对于未特别指定的颜色，使用默认亮色主题的颜色
+		return theme.DefaultTheme().Color(c, theme.VariantLight)
 	}
 }
 

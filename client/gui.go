@@ -29,7 +29,7 @@ func bootGui() {
 	a.Settings().SetTheme(&fghGuiTheme{})
 
 	mainWindow = a.NewWindow(fmt.Sprintf("UT Platform host fetch - V%.1f", VERSION))
-	mainWindow.Resize(fyne.NewSize(800, 580))
+	mainWindow.Resize(fyne.NewSize(600, 400))
 	mainWindow.SetIcon(logoResource)
 
 	logoImage := canvas.NewImageFromResource(logoResource)
@@ -62,7 +62,7 @@ func getTicker(interval int) *time.Ticker {
 }
 
 func guiClientMode() (content fyne.CanvasObject) {
-	logs, addFn := newLogScrollComponent(fyne.NewSize(800, 280))
+	logs, addFn := newLogScrollComponent(fyne.NewSize(590, 280))
 	var cLog = NewFetchLog(NewGuiLogWriter(addFn))
 	var startBtn, stopBtn *widget.Button
 	var interval = strconv.Itoa(_conf.Interval)
