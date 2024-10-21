@@ -6,11 +6,8 @@ require (
 	fyne.io/fyne/v2 v2.5.2
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/nicksnyder/go-i18n/v2 v2.4.1
-	github.com/pelletier/go-toml/v2 v2.2.3
 	github.com/spf13/viper v1.19.0
 	github.com/yimiaoxiehou/tun2socks v0.0.7
-	golang.org/x/text v0.19.0
 )
 
 require (
@@ -45,7 +42,9 @@ require (
 	github.com/jsummers/gobmp v0.0.0-20230614200233-a9de23ed2e25 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nicksnyder/go-i18n/v2 v2.4.1 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
+	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rymdport/portal v0.2.6 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
@@ -71,6 +70,7 @@ require (
 	golang.org/x/mobile v0.0.0-20241016134751-7ff83004ec2c // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 // indirect

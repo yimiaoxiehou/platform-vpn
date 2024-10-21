@@ -7,6 +7,11 @@ import (
 	"fyne.io/fyne/v2/theme"
 )
 
+const (
+	VERSION     = 1.0
+	GuiFontName = "zcool-cryyt.ttf"
+)
+
 type fghGuiTheme struct {
 }
 

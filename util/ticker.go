@@ -1,4 +1,4 @@
-package main
+package util
 
 import "time"
 
@@ -14,4 +14,12 @@ func NewFetchTicker(interval int) *FetchTicker {
 func (f *FetchTicker) Stop() {
 	f.Ticker.Stop()
 	close(f.CloseChan)
+}
+
+func getTicker(interval int) *time.Ticker {
+	d := time.Minute
+	if IsDebug() {
+		d = time.Second
+	}
+	return time.NewTicker(d * time.Duration(interval))
 }

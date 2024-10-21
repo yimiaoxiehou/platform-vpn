@@ -5,4 +5,4 @@ Website = "https://github.com/Licoy/fetch-github-hosts"
   Name = "Fetch-Platform-Hosts"
   ID = "com.github.licoy.fetch-github-hosts"
   Version = "2.8"
-  Build = 98
+  Build = 107

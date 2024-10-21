@@ -15,12 +15,11 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/Licoy/fetch-github-hosts/util"
 	"github.com/yimiaoxiehou/tun2socks/core"
 )
 
 var mainWindow fyne.Window
-var _fileLog *FetchLog
 var engine core.Engine
 
 func bootGui() {
@@ -35,7 +34,7 @@ func bootGui() {
 	logoImage := canvas.NewImageFromResource(logoResource)
 	logoImage.SetMinSize(fyne.NewSize(240, 240))
 
-	if err := GetCheckPermissionResult(); err != nil {
+	if err := util.GetCheckPermissionResult(); err != nil {
 		time.AfterFunc(time.Second, func() {
 			showAlert(err.Error())
 		})
@@ -53,55 +52,38 @@ func getLogoResource() fyne.Resource {
 	return &fyne.StaticResource{StaticName: "logo", StaticContent: content}
 }
 
-func getTicker(interval int) *time.Ticker {
-	d := time.Minute
-	if IsDebug() {
-		d = time.Second
-	}
-	return time.NewTicker(d * time.Duration(interval))
-}
-
 func guiClientMode() (content fyne.CanvasObject) {
 	logs, addFn := newLogScrollComponent(fyne.NewSize(590, 280))
-	var cLog = NewFetchLog(NewGuiLogWriter(addFn))
-	var startBtn, stopBtn *widget.Button
+	var cLog = util.NewFetchLog(util.NewGuiLogWriter(addFn))
+	var startBtn, stopBtn, refreshBtn *widget.Button
 	var interval = strconv.Itoa(_conf.Interval)
 	serverAddr := _conf.ServerAddr
 	intervalInput := widget.NewEntryWithData(binding.BindString(&interval))
 	serverInput := widget.NewEntryWithData(binding.BindString(&serverAddr))
-	var ticker *FetchTicker
+	var ticker *util.FetchTicker
 
-	intervalForm := widget.NewFormItem(t(&i18n.Message{
-		ID:    "GetIntervalMinutes",
-		Other: "获取间隔（分钟）",
-	}), intervalInput)
-	serverForm := widget.NewFormItem(t(&i18n.Message{
-		ID:    "ServerAddr",
-		Other: "服务器地址",
-	}), serverInput)
+	intervalForm := widget.NewFormItem("获取间隔（分钟）", intervalInput)
+	serverForm := widget.NewFormItem("服务器地址", serverInput)
 
 	form := widget.NewForm(
 		intervalForm,
 		serverForm,
 	)
 
-	startFetchExec := func() {
+	startExec := func() {
 		if serverAddr == "" {
 			return
 		}
 		if len(strings.Split(serverAddr, ":")) == 1 {
 			serverAddr += ":1080"
 		}
-		intervalInt := parseStrIsNumberNotShowAlert(&interval, t(&i18n.Message{
-			ID:    "GetIntervalNeedInt",
-			Other: "获取间隔必须为整数",
-		}))
+		intervalInt := parseStrIsNumberNotShowAlert(&interval, "获取间隔必须为整数")
 		if intervalInt == nil {
 			return
 		}
 		stopBtn.Enable()
 		componentsStatusChange(false, startBtn, intervalInput, serverInput)
-		ticker = NewFetchTicker(*intervalInt)
+		ticker = util.NewFetchTicker(*intervalInt)
 		go func() {
 			engine = core.Engine{
 				TunDevice: "utpf-tun",
@@ -115,72 +97,84 @@ func guiClientMode() (content fyne.CanvasObject) {
 				cLog.Print(err.Error())
 			}
 		}()
-		go startClient(ticker, "http://"+serverAddr, cLog)
+		go func() {
+			url := "http://" + serverAddr
+			cLog.Print("远程hosts获取链接: " + url)
+
+			fn := func() {
+				err := util.UpdatePlatformHosts(url)
+				if err != nil {
+					cLog.Print("更新Platform-Hosts失败: " + err.Error())
+				} else {
+					cLog.Print("更新Platform-Hosts成功！")
+				}
+			}
+			fn()
+			for {
+				select {
+				case <-ticker.Ticker.C:
+					fn()
+				case <-ticker.CloseChan:
+					cLog.Print("停止获取hosts")
+					return
+				}
+			}
+		}()
 
 		_conf.ServerAddr = serverAddr
 		_conf.Interval = *intervalInt
 		_conf.Storage()
 	}
-
-	startBtn = widget.NewButton(t(&i18n.Message{
-		ID:    "Start",
-		Other: "启动",
-	}), startFetchExec)
-	stopBtn = widget.NewButton(t(&i18n.Message{
-		ID:    "Stop",
-		Other: "停止",
-	}), func() {
+	stopExec := func() {
 		stopBtn.Disable()
 		componentsStatusChange(true, startBtn, intervalInput, serverInput)
 		engine.Stop()
 		ticker.Stop()
-		if err := flushCleanPlatformHosts(); err != nil {
-			cLog.Print(fmt.Sprintf("%s: %s", t(&i18n.Message{
-				ID:    "CleanHostsFail",
-				Other: "清除hosts中的 platform 记录失败",
-			}), err.Error()))
+		err := util.CleanPlatformHosts()
+		if err != nil {
+			cLog.Print("清理Platform-Hosts失败: " + err.Error())
 		} else {
-			cLog.Print(t(&i18n.Message{
-				ID:    "CleanHostsSuccess",
-				Other: "hosts文件中的 platform 记录已经清除成功",
-			}))
+			cLog.Print("清理Platform-Hosts成功！")
 		}
-	})
+	}
+	refreshExec := func() {
+		if startBtn.Disabled() {
+			url := "http://" + serverAddr
+			err := util.UpdatePlatformHosts(url)
+			if err != nil {
+				cLog.Print("更新Platform-Hosts失败: " + err.Error())
+			} else {
+				cLog.Print("更新Platform-Hosts成功！")
+			}
+		}
+	}
+
+	startBtn = widget.NewButton("启动", startExec)
+	stopBtn = widget.NewButton("停止", stopExec)
+	refreshBtn = widget.NewButton("刷新 Hosts", refreshExec)
 
 	if _conf.AutoFetch {
-		startFetchExec()
+		startExec()
 		startBtn.Disable()
 	} else {
 		stopBtn.Disable()
 	}
-	autoFetchCheck := widget.NewCheck(t(&i18n.Message{
-		ID:    "StartupAutoGet",
-		Other: "启动软件自动获取",
-	}), func(b bool) {
+	autoFetchCheck := widget.NewCheck("启动软件自动获取", func(b bool) {
 		if b != _conf.AutoFetch {
 			_conf.AutoFetch = b
 			_conf.Storage()
-			showAlert(t(&i18n.Message{
-				ID:    "StartupAutoGetTips",
-				Other: "启动软件自动获取状态已改变，将会在下次启动程序时生效！",
-			}))
+			showAlert("启动软件自动获取状态已改变，将会在下次启动程序时生效！")
 		}
 	})
 	autoFetchCheck.SetChecked(_conf.AutoFetch)
 
-	buttons := container.New(layout.NewGridLayout(4), startBtn, stopBtn, container.New(layout.NewCenterLayout(), autoFetchCheck))
+	buttons := container.New(layout.NewGridLayout(4), startBtn, stopBtn, refreshBtn, container.New(layout.NewCenterLayout(), autoFetchCheck))
 	margin := newMargin(fyne.NewSize(10, 10))
 	return container.NewVBox(margin, form, margin, buttons, margin, logs)
 }
 
 func showAlert(msg string) {
-	dialog.NewCustom(t(&i18n.Message{
-		ID:    "Tip",
-		Other: "提示",
-	}), t(&i18n.Message{
-		ID:    "Ok",
-		Other: "确认",
-	}), widget.NewLabel(msg), mainWindow).Show()
+	dialog.NewCustom("提示", "确认", widget.NewLabel(msg), mainWindow).Show()
 }
 
 func parseStrIsNumberNotShowAlert(str *string, msg string) *int {

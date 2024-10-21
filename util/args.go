@@ -1,10 +1,11 @@
-package main
+package util
 
 import (
 	"errors"
 	"fmt"
-	"github.com/jessevdk/go-flags"
 	"os"
+
+	"github.com/jessevdk/go-flags"
 )
 
 type CmdArgs struct {
@@ -18,7 +19,7 @@ type CmdArgs struct {
 	Lang          string `long:"lang" short:"l" description:"使用语言"`
 }
 
-func ParseBootArgs() *CmdArgs {
+func ParseBootArgs(VERSION float64) *CmdArgs {
 	args := &CmdArgs{}
 	_, err := flags.ParseArgs(args, os.Args)
 	if err != nil {
