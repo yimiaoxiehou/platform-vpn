@@ -1,4 +1,4 @@
-module demo
+module github.com/yimiaoxiehou/platform-vpn/server
 
 go 1.22.3
 
