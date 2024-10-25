@@ -33,7 +33,7 @@ func handleConnection(conn net.Conn) {
 	}
 }
 
-func main() {
+func main2() {
 	listener, err := net.Listen("tcp", ":1080")
 	if err != nil {
 		log.Fatalf("Failed to listen on port 1080: %v", err)
@@ -50,4 +50,13 @@ func main() {
 		}
 		go handleConnection(conn)
 	}
+}
+
+func main() {
+	init_docker()
+	n, err := getDockerNet()
+	if err != nil {
+		log.Printf("get docker net error: %v", err)
+	}
+	log.Printf("docker net: %s", n)
 }

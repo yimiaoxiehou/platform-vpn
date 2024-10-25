@@ -18,21 +18,18 @@ import (
 
 var config *rest.Config
 
-func init() {
+func init_k8s() error {
 	// 设置 kubeconfig 文件路径
 	home := homedir.HomeDir()
 	kubeconfig := filepath.Join(home, ".kube", "config")
 
 	// 检查 kubeconfig 文件是否存在
 	if _, err := os.Stat(kubeconfig); os.IsNotExist(err) {
-		// kubeconfig 文件不存在，尝试使用 in-cluster 配置		if err != nil {
-		log.Fatalf("kubeconfig 文件不存在: %v", err)
+		return err
 	} else {
 		// kubeconfig 文件存在，使用它创建 config
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-		if err != nil {
-			log.Fatalf("Error building kubeconfig: %v", err)
-		}
+		return err
 	}
 }
 
@@ -58,27 +55,28 @@ func getK8sHosts() (string, error) {
 			log.Printf("Error listing services in namespace %s: %v", ns.Name, err)
 			continue
 		}
+		hlSvc := make(map[string]corev1.Service)
 		items := make(map[string]corev1.Service)
-		hlSvc := make([]corev1.Service, 0)
 
 		for _, svc := range services.Items {
 			if svc.Spec.ClusterIP == "None" {
-				hlSvc = append(hlSvc, svc)
+				hlSvc[svc.Name] = svc
 			} else {
 				items[svc.Name] = svc
 			}
 		}
 
-		for _, svc := range hlSvc {
-			if svc, ok := items[svc.Name+"-hl"]; ok {
-				k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, svc.Name+"."+ns.Name+"."+"svc.cluster.local")
-			}
-		}
-
 		for _, svc := range items {
+			if s, ok := hlSvc[svc.Name+"-hl"]; ok {
+				k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, s.Name+"."+ns.Name+"."+"svc.cluster.local")
+			}
 			k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, svc.Name+"."+ns.Name+"."+"svc.cluster.local")
 		}
 	}
 	k8sHosts += end
 	return k8sHosts, nil
+}
+
+func getK8sNet() (string, error) {
+	return "10.96.0.0/12", nil
 }

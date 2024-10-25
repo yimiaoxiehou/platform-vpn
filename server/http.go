@@ -9,40 +9,63 @@ import (
 	"strings"
 )
 
+var getHosts func() (string, error)
+var getNets func() (string, error)
+
+func init() {
+	err := init_k8s()
+	if err != nil {
+		log.Printf("connect k8s error: %v", err)
+		log.Printf("read hosts from docker")
+		init_docker()
+		getHosts = getDockerHosts
+		getNets = getDockerNet
+	} else {
+		getHosts = getK8sHosts
+		getNets = getK8sNet
+	}
+}
+
 func handleHTTP(conn net.Conn) {
+	defer conn.Close()
 	reader := bufio.NewReader(conn)
-	_, err := http.ReadRequest(reader)
+	req, err := http.ReadRequest(reader)
 	if err != nil {
 		log.Printf("Error reading HTTP request: %v", err)
 		return
 	}
 
 	var resp *http.Response
-	var content string
-	h, err := getK8sHosts()
-	if err != nil {
-		resp = &http.Response{
-			StatusCode: 500,
-			ProtoMajor: 1,
-			ProtoMinor: 1,
-			Header:     make(http.Header),
+	switch req.URL.Path {
+	case "/hosts":
+		h, err := getHosts()
+		if err != nil {
+			resp = createResponse(500, err.Error())
+		} else {
+			resp = createResponse(200, h)
 		}
-		content = err.Error()
-	} else {
-		resp = &http.Response{
-			StatusCode: 200,
-			ProtoMajor: 1,
-			ProtoMinor: 1,
-			Header:     make(http.Header),
+	case "/net":
+		n, err := getNets()
+		if err != nil {
+			resp = createResponse(500, err.Error())
+		} else {
+			resp = createResponse(200, n)
 		}
-		content = h
+	default:
+		resp = createResponse(404, "Not Found")
 	}
-
-	resp.Header.Set("Content-Type", "text/plain")
-
-	resp.Body = io.NopCloser(strings.NewReader(content))
 
 	if err := resp.Write(conn); err != nil {
 		log.Printf("Error writing HTTP response: %v", err)
+	}
+}
+
+func createResponse(statusCode int, content string) *http.Response {
+	return &http.Response{
+		StatusCode: statusCode,
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+		Header:     http.Header{"Content-Type": {"text/plain"}},
+		Body:       io.NopCloser(strings.NewReader(content)),
 	}
 }
