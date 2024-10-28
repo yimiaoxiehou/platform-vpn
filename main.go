@@ -6,8 +6,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/Licoy/fetch-github-hosts/util"
 	"github.com/getlantern/elevate"
+	"github.com/yimiaoxiehou/platform-vpn/util"
 )
 
 //go:embed assets

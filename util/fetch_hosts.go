@@ -36,20 +36,18 @@ func getCleanPlatformHosts() (*bytes.Buffer, error) {
 	header := "## Platform START\n"
 	end := "## Platform END\n"
 
-	for {
-		platformHostStartIdx := strings.Index(hostsStr, header)
-		if platformHostStartIdx == -1 {
-			hosts.WriteString(string(hostsBytes))
-			break
-		}
-
-		platformHostEndIdx := strings.Index(hostsStr, end)
-		if platformHostEndIdx == -1 {
-			hosts.WriteString(string(hostsBytes))
-			break
-		}
-		hostsStr = hostsStr[0:platformHostStartIdx] + hostsStr[platformHostEndIdx+len(end):]
+	platformHostStartIdx := strings.Index(hostsStr, header)
+	if platformHostStartIdx == -1 {
+		hosts.WriteString(string(hostsBytes))
+		return hosts, err
 	}
+
+	platformHostEndIdx := strings.Index(hostsStr, end)
+	if platformHostEndIdx == -1 {
+		hosts.WriteString(string(hostsBytes))
+		return hosts, err
+	}
+	hostsStr = hostsStr[0:platformHostStartIdx] + hostsStr[platformHostEndIdx+len(end):]
 
 	_, err = hosts.Write([]byte(hostsStr))
 	return hosts, err
@@ -78,4 +76,14 @@ func CleanPlatformHosts() error {
 		return err
 	}
 	return os.WriteFile(GetSystemHostsPath(), hosts.Bytes(), os.ModeType)
+}
+
+func GetPlatformNets(url string) ([]string, error) {
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return nil, err
+	}
+
+	nets, err := io.ReadAll(resp.Body)
+	return strings.Split(string(nets), "\n"), err
 }

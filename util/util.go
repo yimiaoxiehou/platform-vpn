@@ -82,11 +82,7 @@ func GetExecOrEmbedFile(fs *embed.FS, filename string) (template []byte, err err
 
 func GetCheckPermissionResult() (err error) {
 	permission, err := PreCheckHasHostsRWPermission()
-	if err != nil {
-		err = errors.New("检查hosts读写权限失败，请以sudo或管理员身份来运行本程序！")
-		return
-	}
-	if !permission {
+	if err != nil || !permission {
 		if runtime.GOOS == Windows {
 			err = errors.New("请鼠标右键选择【以管理员的身份运行】来执行本程序！")
 		} else {

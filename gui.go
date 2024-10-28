@@ -15,12 +15,13 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/Licoy/fetch-github-hosts/util"
+	"github.com/yimiaoxiehou/platform-vpn/util"
 	"github.com/yimiaoxiehou/tun2socks/core"
 )
 
 var mainWindow fyne.Window
 var engine core.Engine
+var hostsUrl string
 
 func bootGui() {
 	logoResource := getLogoResource()
@@ -77,6 +78,8 @@ func guiClientMode() (content fyne.CanvasObject) {
 		if len(strings.Split(serverAddr, ":")) == 1 {
 			serverAddr += ":1080"
 		}
+
+		hostsUrl = "http://" + serverAddr + "/hosts"
 		intervalInt := parseStrIsNumberNotShowAlert(&interval, "获取间隔必须为整数")
 		if intervalInt == nil {
 			return
@@ -84,13 +87,19 @@ func guiClientMode() (content fyne.CanvasObject) {
 		stopBtn.Enable()
 		componentsStatusChange(false, startBtn, intervalInput, serverInput)
 		ticker = util.NewFetchTicker(*intervalInt)
+		nets, err := util.GetPlatformNets("http://" + serverAddr + "/nets")
+		if err != nil {
+			cLog.Print("获取平台网络失败: " + err.Error())
+			return
+		}
 		go func() {
 			engine = core.Engine{
 				TunDevice: "utpf-tun",
-				TunAddr:   "10.96.255.255",
-				TunMask:   "255.240.0.0",
+				TunAddr:   "10.10.10.10",
+				TunMask:   "255.255.255.255",
 				Mtu:       1420,
 				Sock5Addr: "socks5://" + serverAddr,
+				Routers:   nets,
 			}
 			err := engine.Start()
 			if err != nil {
@@ -98,11 +107,10 @@ func guiClientMode() (content fyne.CanvasObject) {
 			}
 		}()
 		go func() {
-			url := "http://" + serverAddr
-			cLog.Print("远程hosts获取链接: " + url)
+			cLog.Print("远程hosts获取链接: " + hostsUrl)
 
 			fn := func() {
-				err := util.UpdatePlatformHosts(url)
+				err := util.UpdatePlatformHosts(hostsUrl)
 				if err != nil {
 					cLog.Print("更新Platform-Hosts失败: " + err.Error())
 				} else {
@@ -139,8 +147,7 @@ func guiClientMode() (content fyne.CanvasObject) {
 	}
 	refreshExec := func() {
 		if startBtn.Disabled() {
-			url := "http://" + serverAddr
-			err := util.UpdatePlatformHosts(url)
+			err := util.UpdatePlatformHosts(hostsUrl)
 			if err != nil {
 				cLog.Print("更新Platform-Hosts失败: " + err.Error())
 			} else {

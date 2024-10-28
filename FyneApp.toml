@@ -1,8 +1,6 @@
-Website = "https://github.com/Licoy/fetch-github-hosts"
-
 [Details]
   Icon = "assets/public/logo.png"
-  Name = "Fetch-Platform-Hosts"
-  ID = "com.github.licoy.fetch-github-hosts"
-  Version = "2.8"
-  Build = 107
+  Name = "platform-vpn"
+  ID = "cn.utpf.platform-vpn"
+  Version = "1.0"
+  Build = 6

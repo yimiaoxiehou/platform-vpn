@@ -1,4 +1,4 @@
-module github.com/Licoy/fetch-github-hosts
+module github.com/yimiaoxiehou/platform-vpn
 
 go 1.23.1
 
@@ -7,7 +7,7 @@ require (
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/spf13/viper v1.19.0
-	github.com/yimiaoxiehou/tun2socks v0.0.7
+	github.com/yimiaoxiehou/tun2socks v0.0.11
 )
 
 require (
