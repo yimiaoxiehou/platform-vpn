@@ -35,7 +35,7 @@ func getDockerHosts() (string, error) {
 		}
 		for _, network := range containerInfo.NetworkSettings.Networks {
 			for _, alias := range network.Aliases {
-				k8sHosts += fmt.Sprintf("%s %s\n", network.IPAddress, alias)
+				k8sHosts += fmt.Sprintf("%s\t%s\n", network.IPAddress, alias)
 			}
 		}
 	}

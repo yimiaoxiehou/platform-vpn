@@ -68,9 +68,9 @@ func getK8sHosts() (string, error) {
 
 		for _, svc := range items {
 			if s, ok := hlSvc[svc.Name+"-hl"]; ok {
-				k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, s.Name+"."+ns.Name+"."+"svc.cluster.local")
+				k8sHosts += fmt.Sprintf("%s\t%s\n", svc.Spec.ClusterIP, s.Name+"."+ns.Name+"."+"svc.cluster.local")
 			}
-			k8sHosts += fmt.Sprintf("%s %s\n", svc.Spec.ClusterIP, svc.Name+"."+ns.Name+"."+"svc.cluster.local")
+			k8sHosts += fmt.Sprintf("%s\t%s\n", svc.Spec.ClusterIP, svc.Name+"."+ns.Name+"."+"svc.cluster.local")
 		}
 	}
 	k8sHosts += end

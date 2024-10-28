@@ -44,7 +44,7 @@ func handleHTTP(conn net.Conn) {
 		} else {
 			resp = createResponse(200, h)
 		}
-	case "/net":
+	case "/nets":
 		n, err := getNets()
 		if err != nil {
 			resp = createResponse(500, err.Error())
