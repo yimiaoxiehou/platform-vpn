@@ -13,7 +13,6 @@ const App: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-
     <ConfigProvider
         theme={{
           cssVar: true,

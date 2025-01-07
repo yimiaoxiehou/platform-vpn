@@ -3,12 +3,24 @@ import { Button, Form, Input, Select, Row, Col, message } from 'antd';
 import { OpenHosts, RefreshHosts, StartVPN, StopVPN } from "../../wailsjs/go/main/App";
 import { main } from "../../wailsjs/go/models";
 export const Home = () => {
-  const [config, setConfig] = useState<main.VPNConfig>(main.VPNConfig.createFrom({
-    Server: '',
-    User: 'root', 
-    Password: '',
-    RefreshInterval: 1,
-  }));
+
+  const [config, setConfig] = useState<main.VPNConfig>(() => {
+    const storedConfig = localStorage.getItem('vpnConfig');
+    return storedConfig
+      ? new main.VPNConfig(JSON.parse(storedConfig))
+      : new main.VPNConfig({
+          Server: '',
+          User: 'root',
+          Password: '',
+          RefreshInterval: 1,
+        });
+  });
+
+  useEffect(() => {
+    localStorage.setItem('vpnConfig', JSON.stringify(config));
+  }, [config]);
+
+
 
   const [isVPNActive, setIsVPNActive] = useState<boolean>(() => {
     return localStorage.getItem('isVPNActive') === 'true';
@@ -99,6 +111,7 @@ export const Home = () => {
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Form.Item label="服务器">
             <Input
+              allowClear
               disabled={isVPNActive}
               style={{ width: '200px' }}
               value={config.Server}
@@ -107,6 +120,7 @@ export const Home = () => {
         </Form.Item>
         <Form.Item label="账户">
           <Input
+            allowClear
             disabled={isVPNActive}
             style={{ width: '200px' }}
             value={config.User}
@@ -115,6 +129,7 @@ export const Home = () => {
         </Form.Item>
         <Form.Item label="密码">
           <Input.Password
+            allowClear
             disabled={isVPNActive}
             style={{ width: '200px' }}
             value={config.Password}
