@@ -59,6 +59,7 @@ func main() {
 		Logger:             log.NewLogger(),
 		LogLevel:           logger.INFO,
 		LogLevelProduction: logger.INFO,
+		DisableResize:      true,
 	})
 
 	if err != nil {
