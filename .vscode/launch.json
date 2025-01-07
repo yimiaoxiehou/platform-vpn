@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Wails: Production platform-vpn",
+        "type": "go",
+        "request": "launch",
+        "console": "integratedTerminal",
+        "mode": "exec",
+        "asRoot": true,
+        "program": "${workspaceFolder}/build/bin/platform-vpn",
+        "preLaunchTask": "build",
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "name": "Wails: Debug platform-vpn",
+        "type": "go",
+        "request": "launch",
+        "mode": "exec",
+        "asRoot": true,
+        "program": "${workspaceFolder}/build/bin/platform-vpn",
+        "preLaunchTask": "build debug",
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}",
+        
+      },
+      {
+        "name": "Wails: Dev platform-vpn",
+        "type": "go",
+        "request": "launch",
+        "console": "integratedTerminal",
+        "mode": "exec",
+        "asRoot": true,
+        "program": "${workspaceFolder}/build/bin/platform-vpn",
+        "preLaunchTask": "build dev",
+        "cwd": "${workspaceFolder}"
+      }
+    ]
+  }
