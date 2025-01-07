@@ -1,3 +1,2 @@
-build/bin
 node_modules
-gui/dist
+vendor
