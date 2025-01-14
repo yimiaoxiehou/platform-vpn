@@ -14,6 +14,7 @@ import (
 	C "github.com/metacubex/mihomo/constant"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/sing_tun"
+	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -47,6 +48,24 @@ func StopTun(ctx context.Context) error {
 }
 
 func StartTun(ctx context.Context, config TunConfig) error {
+	sub := log.Subscribe()
+	defer log.UnSubscribe(sub)
+	go func() {
+		for event := range sub {
+			switch event.LogLevel {
+			case log.DEBUG:
+				runtime.LogDebug(ctx, event.Payload)
+			case log.ERROR:
+				runtime.LogError(ctx, event.Payload)
+			case log.WARNING:
+				runtime.LogWarning(ctx, event.Payload)
+			case log.INFO:
+				runtime.LogInfo(ctx, event.Payload)
+			default:
+				runtime.LogPrint(ctx, event.Payload)
+			}
+		}
+	}()
 	tunConf := LC.Tun{
 		Enable:      true,
 		StrictRoute: true,
@@ -107,7 +126,7 @@ func ReCreateTun(ctx context.Context, tunConf LC.Tun, tunnel C.Tunnel) error {
 
 	// Close the current TUN listener.
 	closeTunListener()
-
+	UpdateDNS()
 	// Create a new TUN listener with the provided configuration and tunnel.
 	lister, err := sing_tun.New(tunConf, tunnel)
 	if err != nil {
