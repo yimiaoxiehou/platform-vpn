@@ -30,6 +30,8 @@ export const Home = () => {
     localStorage.setItem('isVPNActive', String(isVPNActive));
   }, [isVPNActive]);
 
+  const [loadingToggleVPN, setLoadingToggleVPN] = useState<boolean>(false);
+
   const refreshIntervalOptions = [
     { label: '1分钟', value: 1 },
     { label: '5分钟', value: 5 },
@@ -63,6 +65,8 @@ export const Home = () => {
   };
 
   const toggleVPN = () => {
+    if (loadingToggleVPN) return;
+    setLoadingToggleVPN(true);
     if (isVPNActive) {
       StopVPN()
         .then(() => {
@@ -71,39 +75,52 @@ export const Home = () => {
         })
         .catch(err => {
           message.error('停止 VPN 失败: ' + err);
+        })
+        .finally(() => {
+          setLoadingToggleVPN(false);
         });
-  } else {
-    if (!config.Server || !config.User || !config.Password || !config.RefreshInterval) {
-      message.error('请填写完整配置');
-      return
-    }
-    StartVPN(config)
-      .then((rs) => {
-        console.log(rs)
-        if (rs) {
-          message.success('VPN 已启动');
-          setIsVPNActive(true);
-        } else {
-          message.error('VPN 启动失败');
-        }
-      })
-      .catch(err => {
-        message.error('启动 VPN 失败: ' + err);
-      }).finally(() => {
-        console.log('finally')
-      });
+    } else {
+      if (!config.Server || !config.User || !config.Password || !config.RefreshInterval) {
+        message.error('请填写完整配置');
+        setLoadingToggleVPN(false);
+        return;
+      }
+      StartVPN(config)
+        .then((rs) => {
+          console.log(rs);
+          if (rs) {
+            message.success('VPN 已启动');
+            setIsVPNActive(true);
+          } else {
+            message.error('VPN 启动失败');
+          }
+        })
+        .catch(err => {
+          message.error('启动 VPN 失败: ' + err);
+        })
+        .finally(() => {
+          console.log('finally');
+          setLoadingToggleVPN(false);
+        });
     }
   };
 
-  const toggleRefreshHosts= () => {
+  const [loadingRefreshHosts, setLoadingRefreshHosts] = useState<boolean>(false);
+
+  const toggleRefreshHosts = () => {
+    if (loadingRefreshHosts) return;
+    setLoadingRefreshHosts(true);
     RefreshHosts()
       .then(() => {
         message.success('hosts 已刷新');
       })
       .catch(err => {
         message.error('刷新 hosts 失败: ' + err);
+      })
+      .finally(() => {
+        setLoadingRefreshHosts(false);
       });
-  }
+  };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -153,6 +170,7 @@ export const Home = () => {
                 type={isVPNActive ? "primary" : "default"}
                 danger={isVPNActive}
                 onClick={toggleVPN}
+                loading={loadingToggleVPN}
               >
                 {isVPNActive ? "停止" : "开始"}
               </Button>
@@ -165,7 +183,7 @@ export const Home = () => {
                   </Button>
                 </Col>
                 <Col>
-                  <Button onClick={toggleRefreshHosts}>
+                  <Button onClick={toggleRefreshHosts} loading={loadingRefreshHosts}>
                     手动刷新 hosts
                   </Button>
                 </Col>

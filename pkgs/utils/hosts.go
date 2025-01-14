@@ -7,7 +7,10 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
+
+var hostsMutex sync.Mutex
 
 // GetHostsFilePath 返回系统 hosts 文件的路径
 func GetSystemHostsPath() string {
@@ -45,8 +48,11 @@ func getCleaningHosts() (*bytes.Buffer, error) {
 	return hosts, err
 }
 
-// updatePlatformHosts 更新平台 Hosts 文件
+// UpdatePlatformHosts 更新平台 Hosts 文件
 func UpdatePlatformHosts(appendHosts string) error {
+	hostsMutex.Lock()
+	defer hostsMutex.Unlock()
+
 	hosts, err := getCleaningHosts()
 	if err != nil {
 		return err
@@ -59,6 +65,9 @@ func UpdatePlatformHosts(appendHosts string) error {
 }
 
 func CleanPlatformHosts(ctx context.Context) error {
+	hostsMutex.Lock()
+	defer hostsMutex.Unlock()
+
 	hosts, err := getCleaningHosts()
 	if err != nil {
 		return err
