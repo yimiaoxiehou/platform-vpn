@@ -28,8 +28,8 @@ func getCleaningHosts() (*bytes.Buffer, error) {
 		return hosts, err
 	}
 	hostsStr := string(hostsBytes)
-	header := "## Platform START\n"
-	end := "## Platform END\n"
+	header := "\n\n\n## Platform START\n\n\n"
+	end := "\n\n\n## Platform END\n\n\n"
 
 	platformHostStartIdx := strings.Index(hostsStr, header)
 	if platformHostStartIdx == -1 {
