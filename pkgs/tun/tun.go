@@ -11,9 +11,11 @@ import (
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/outbound"
+	"github.com/metacubex/mihomo/common/observable"
 	C "github.com/metacubex/mihomo/constant"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/sing_tun"
+	mlog "github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
 )
 
@@ -39,13 +41,33 @@ type TunConfig struct {
 	// Fallback_DNS string
 }
 
+var mlogSub observable.Subscription[mlog.Event]
+
 func StopTun() error {
 	tunnel.OnSuspend()
+	mlog.UnSubscribe(mlogSub)
 	closeTunListener()
 	return utils.CleanPlatformHosts()
 }
 
 func StartTun(config TunConfig) error {
+	mlogSub = mlog.Subscribe()
+	go func() {
+		for logM := range mlogSub {
+			switch logM.LogLevel {
+			case mlog.DEBUG:
+				log.Debug(logM.Payload)
+			case mlog.INFO:
+				log.Info(logM.Payload)
+			case mlog.WARNING:
+				log.Warning(logM.Payload)
+			case mlog.ERROR:
+				log.Error(logM.Payload)
+			default:
+			}
+		}
+	}()
+
 	tunConf := LC.Tun{
 		Enable:      true,
 		StrictRoute: true,
