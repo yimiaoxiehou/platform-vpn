@@ -32,6 +32,16 @@ func main() {
 		return
 	}
 	port = strings.TrimSpace(port)
+	var portInt int
+	if port == "" {
+		portInt = 22
+	} else {
+		portInt, err = strconv.Atoi(port)
+		if err != nil {
+			fmt.Println("端口号无效:", err)
+			return
+		}
+	}
 
 	fmt.Print("请输入用户名[root]: ")
 	username, err := reader.ReadString('\n')
@@ -40,6 +50,9 @@ func main() {
 		return
 	}
 	username = strings.TrimSpace(username)
+	if username == "" {
+		username = "root"
+	}
 
 	fmt.Print("请输入密码: ")
 	password, err := reader.ReadString('\n')
@@ -48,11 +61,6 @@ func main() {
 		return
 	}
 	password = strings.TrimSpace(password)
-	portInt, err := strconv.Atoi(port)
-	if err != nil {
-		fmt.Println("端口号无效:", err)
-		return
-	}
 
 	// 使用输入的用户名、密码和服务器进行 VPN 连接
 	err = vpn.StartVPN(username, password, server, portInt, 1*time.Minute)
