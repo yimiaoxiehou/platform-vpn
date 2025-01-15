@@ -5,8 +5,6 @@ import (
 	"os"
 	"strings"
 
-	"platform-vpn/pkgs/log"
-
 	"github.com/getlantern/elevate"
 
 	"github.com/wailsapp/wails/v2"
@@ -15,7 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:gui/dist
+//go:embed all:front/dist
 var assets embed.FS
 
 func main() {
@@ -56,7 +54,6 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
-		Logger:             log.NewLogger(),
 		LogLevel:           logger.INFO,
 		LogLevelProduction: logger.INFO,
 		DisableResize:      true,

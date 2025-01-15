@@ -39,6 +39,7 @@ type AppResponse[T any] struct {
 type VPNConfig struct {
 	Server          string
 	User            string
+	Port            int
 	Password        string
 	RefreshInterval int
 }
@@ -56,7 +57,7 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) StartVPN(config *VPNConfig) (bool, string) {
 
-	err := vpn.StartVPN(a.ctx, config.User, config.Password, config.Server, 22, time.Duration(config.RefreshInterval)*time.Minute)
+	err := vpn.StartVPN(config.User, config.Password, config.Server, config.Port, time.Duration(config.RefreshInterval)*time.Minute)
 	if err != nil {
 		return false, fmt.Sprintf("连接 VPN 服务器[%s]失败: %v", config.Server, err)
 	}
@@ -65,17 +66,17 @@ func (a *App) StartVPN(config *VPNConfig) (bool, string) {
 }
 
 func (a *App) StopVPN() error {
-	err := vpn.StopVPN(a.ctx)
+	err := vpn.StopVPN()
 	if err != nil {
-		log.NewLogger().Error(fmt.Sprintf("停止VPN出错: %v", err))
+		log.Error(fmt.Sprintf("停止VPN出错: %v", err))
 	} else {
-		log.NewLogger().Info("停止VPN成功")
+		log.Info("停止VPN成功")
 	}
 	return err
 }
 
 func (a *App) RefreshHosts() error {
-	return vpn.UpdateHosts(a.ctx)
+	return vpn.UpdateHosts()
 }
 
 func (a *App) OpenHosts() error {
@@ -105,7 +106,7 @@ func (a *App) GetServices() ([]AppNsService, error) {
 
 	servicess := make([]AppNsService, 0)
 
-	svcss, err := k3s.GetServices(a.ctx)
+	svcss, err := k3s.GetServices()
 	if err != nil {
 		return servicess, err
 	}
@@ -132,5 +133,5 @@ func (a *App) GetServices() ([]AppNsService, error) {
 }
 
 func (a *App) GetLogs() ([]*log.LogItem, error) {
-	return log.NewLogger().GetLogs(), nil
+	return log.GetLogs(), nil
 }

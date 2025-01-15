@@ -92,6 +92,7 @@ export namespace main {
 	export class VPNConfig {
 	    Server: string;
 	    User: string;
+	    Port: number;
 	    Password: string;
 	    RefreshInterval: number;
 	
@@ -103,6 +104,7 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.Server = source["Server"];
 	        this.User = source["User"];
+	        this.Port = source["Port"];
 	        this.Password = source["Password"];
 	        this.RefreshInterval = source["RefreshInterval"];
 	    }

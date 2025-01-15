@@ -11,6 +11,7 @@ export const Home = () => {
       : new main.VPNConfig({
           Server: '',
           User: 'root',
+          Port: 22,
           Password: '',
           RefreshInterval: 1,
         });
@@ -126,7 +127,7 @@ export const Home = () => {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
       <Form layout="vertical" style={{ maxWidth: '600px', padding: '15px', gap: '15px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <Form.Item label="服务器">
+          <Form.Item label="服务器ip">
             <Input
               allowClear
               disabled={isVPNActive}
@@ -135,7 +136,7 @@ export const Home = () => {
               onChange={(e) => handleChange('Server')(e.target.value)}
             />
         </Form.Item>
-        <Form.Item label="账户">
+        <Form.Item label="ssh账户">
           <Input
             allowClear
             disabled={isVPNActive}
@@ -144,7 +145,16 @@ export const Home = () => {
             onChange={(e) => handleChange('User')(e.target.value)}
           />
         </Form.Item>
-        <Form.Item label="密码">
+        <Form.Item label="ssh端口">
+          <Input
+            allowClear
+            disabled={isVPNActive}
+            style={{ width: '200px' }}
+            value={config.Port}
+            onChange={(e) => handleChange('Port')(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="ssh密码">
           <Input.Password
             allowClear
             disabled={isVPNActive}

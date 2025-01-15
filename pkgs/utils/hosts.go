@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -64,7 +63,7 @@ func UpdatePlatformHosts(appendHosts string) error {
 	return os.WriteFile(GetSystemHostsPath(), hosts.Bytes(), os.ModeType)
 }
 
-func CleanPlatformHosts(ctx context.Context) error {
+func CleanPlatformHosts() error {
 	hostsMutex.Lock()
 	defer hostsMutex.Unlock()
 

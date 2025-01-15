@@ -1,28 +1,30 @@
 package vpn
 
 import (
-	"context"
 	"fmt"
 	"platform-vpn/pkgs/k3s"
+	"platform-vpn/pkgs/log"
 	"platform-vpn/pkgs/tun"
 	"platform-vpn/pkgs/utils"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/showa-93/go-mask"
 )
 
 var k3sClinet *k3s.Client
 
-func StopVPN(ctx context.Context) error {
+func StopVPN() error {
 	if updateHostsTicker != nil {
 		updateHostsTicker.Stop()
 	}
-	return tun.StopTun(ctx)
+	return tun.StopTun()
 }
 
 var updateHostsTicker *time.Ticker
 
-func StartVPN(ctx context.Context, user string, password string, host string, port int, RefreshInterval time.Duration) error {
+func StartVPN(user string, password string, host string, port int, RefreshInterval time.Duration) error {
+	maskPassword, _ := mask.String(mask.MaskTypeFilled, password)
+	log.Info(fmt.Sprintf("连接 VPN 服务器[%s], 配置：%s, %d, %s", host, user, port, maskPassword))
 	var err error
 	k3sClinet, err = k3s.NewClient(host, port, user, password)
 	if err != nil {
@@ -34,7 +36,7 @@ func StartVPN(ctx context.Context, user string, password string, host string, po
 		return err
 	}
 
-	err = tun.StartTun(ctx, tun.TunConfig{
+	err = tun.StartTun(tun.TunConfig{
 		Device:      "demo",
 		Inet4Addr:   "10.10.0.1",
 		RouteAddrs:  []string{config.ClusterCIDR, config.ServiceCIDR},
@@ -43,30 +45,30 @@ func StartVPN(ctx context.Context, user string, password string, host string, po
 		SSHUser:     user,
 		SSHPassword: password,
 	})
-	if err != nil {
+	if err == nil {
 		// 首次立即执行一次
-		UpdateHosts(ctx)
+		UpdateHosts()
 
 		// 创建一个定时器，每5分钟触发一次
 		updateHostsTicker = time.NewTicker(RefreshInterval)
 		// 在后台循环执行
 		go func() {
 			for range updateHostsTicker.C {
-				UpdateHosts(ctx)
+				UpdateHosts()
 			}
 		}()
 	}
 	return err
 }
 
-func UpdateHosts(ctx context.Context) error {
-	utils.CleanPlatformHosts(ctx)
-	if hosts, err := k3sClinet.GetServiceHosts(ctx); err != nil {
-		runtime.LogError(ctx, fmt.Sprintf("更新hosts失败: %v", err))
+func UpdateHosts() error {
+	utils.CleanPlatformHosts()
+	if hosts, err := k3sClinet.GetServiceHosts(); err != nil {
+		log.Error(fmt.Sprintf("更新hosts失败: %v", err))
 		return err
 	} else {
 		utils.UpdatePlatformHosts(hosts)
-		runtime.LogPrint(ctx, "已更新hosts列表。")
+		log.Info("已更新hosts列表。")
 		return err
 	}
 }

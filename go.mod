@@ -18,6 +18,7 @@ require (
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
 	github.com/metacubex/mihomo v1.19.0
 	github.com/qdm12/dns/v2 v2.0.0-rc8.0.20241104163901-111c6a1be760
+	github.com/showa-93/go-mask v0.6.2
 	github.com/wailsapp/wails/v2 v2.9.2
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.32.0
