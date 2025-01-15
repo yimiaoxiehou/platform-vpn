@@ -1,7 +1,6 @@
 package k3s
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"platform-vpn/pkgs/utils"
@@ -74,7 +73,7 @@ func (c *Client) GetK3sConfig() (RancherK3sConfig, error) {
 	return newConfig, nil
 }
 
-func (c *Client) GetNsServices(ctx context.Context) (map[string][]corev1.Service, error) {
+func (c *Client) GetNsServices() (map[string][]corev1.Service, error) {
 	nsSvcs := make(map[string][]corev1.Service)
 	var serviceList corev1.ServiceList
 	output, err := c.remoteExec("k3s kubectl get svc -A -o json")
@@ -100,8 +99,8 @@ func (c *Client) GetNsServices(ctx context.Context) (map[string][]corev1.Service
 	return nsSvcs, nil
 }
 
-func (c *Client) GetServiceHosts(ctx context.Context) (string, error) {
-	nsSvcs, err := c.GetNsServices(ctx)
+func (c *Client) GetServiceHosts() (string, error) {
+	nsSvcs, err := c.GetNsServices()
 	if err != nil {
 		return "", err
 	}
@@ -147,6 +146,6 @@ func (c *Client) GetServiceHosts(ctx context.Context) (string, error) {
 	return k8sHosts, nil
 }
 
-func GetServices(ctx context.Context) (map[string][]corev1.Service, error) {
-	return _client.GetNsServices(ctx)
+func GetServices() (map[string][]corev1.Service, error) {
+	return _client.GetNsServices()
 }

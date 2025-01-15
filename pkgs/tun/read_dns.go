@@ -62,6 +62,6 @@ func UpdateDNS() {
 		resolver.DirectHostResolver = r.Resolver
 	}
 
-	dns.ReCreateServer("any:5399", r.Resolver, m)
+	dns.ReCreateServer(":5399", r.Resolver, m)
 
 }

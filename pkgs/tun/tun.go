@@ -1,9 +1,9 @@
 package tun
 
 import (
-	"context"
 	"fmt"
 	"net/netip"
+	"platform-vpn/pkgs/log"
 	"platform-vpn/pkgs/utils"
 	"strconv"
 	"strings"
@@ -14,9 +14,7 @@ import (
 	C "github.com/metacubex/mihomo/constant"
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/sing_tun"
-	"github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/tunnel"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var (
@@ -41,31 +39,13 @@ type TunConfig struct {
 	// Fallback_DNS string
 }
 
-func StopTun(ctx context.Context) error {
+func StopTun() error {
 	tunnel.OnSuspend()
 	closeTunListener()
-	return utils.CleanPlatformHosts(ctx)
+	return utils.CleanPlatformHosts()
 }
 
-func StartTun(ctx context.Context, config TunConfig) error {
-	sub := log.Subscribe()
-	defer log.UnSubscribe(sub)
-	go func() {
-		for event := range sub {
-			switch event.LogLevel {
-			case log.DEBUG:
-				runtime.LogDebug(ctx, event.Payload)
-			case log.ERROR:
-				runtime.LogError(ctx, event.Payload)
-			case log.WARNING:
-				runtime.LogWarning(ctx, event.Payload)
-			case log.INFO:
-				runtime.LogInfo(ctx, event.Payload)
-			default:
-				runtime.LogPrint(ctx, event.Payload)
-			}
-		}
-	}()
+func StartTun(config TunConfig) error {
 	tunConf := LC.Tun{
 		Enable:      true,
 		StrictRoute: true,
@@ -98,7 +78,7 @@ func StartTun(ctx context.Context, config TunConfig) error {
 	})
 	proxies["DIRECT"] = adapter.NewProxy(sshProxy)
 	tunnel.UpdateProxies(proxies, nil)
-	err := ReCreateTun(ctx, tunConf, Tunnel)
+	err := ReCreateTun(tunConf, Tunnel)
 	if err != nil {
 		return err
 	}
@@ -106,7 +86,7 @@ func StartTun(ctx context.Context, config TunConfig) error {
 	return nil
 }
 
-func ReCreateTun(ctx context.Context, tunConf LC.Tun, tunnel C.Tunnel) error {
+func ReCreateTun(tunConf LC.Tun, tunnel C.Tunnel) error {
 	// Sort the TUN configuration.
 	tunConf.Sort()
 
@@ -120,7 +100,7 @@ func ReCreateTun(ctx context.Context, tunConf LC.Tun, tunnel C.Tunnel) error {
 	var err error
 	defer func() {
 		if err != nil {
-			runtime.LogError(ctx, fmt.Sprintf("Start TUN listening error: %s", err.Error()))
+			log.Error(fmt.Sprintf("Start TUN listening error: %s", err.Error()))
 		}
 	}()
 
@@ -135,7 +115,7 @@ func ReCreateTun(ctx context.Context, tunConf LC.Tun, tunnel C.Tunnel) error {
 	tunLister = lister
 
 	// Log the address where the TUN adapter is listening.
-	runtime.LogPrint(ctx, fmt.Sprintf("[TUN] Tun adapter listening at: %s", tunLister.Address()))
+	log.Info(fmt.Sprintf("[TUN] Tun adapter listening at: %s", tunLister.Address()))
 	return nil
 }
 

@@ -30,39 +30,35 @@ func NewLogger() *Logger {
 	return _logger
 }
 
-func (log *Logger) GetLogs() []*LogItem {
-	return log.items
+func GetLogs() []*LogItem {
+	return NewLogger().items
 }
 
-func (log *Logger) Print(message string) {
-	log.Info(message)
+func Trace(message string) {
+	NewLogger().addItem("TRACE", message)
 }
 
-func (log *Logger) Trace(message string) {
-	log.addItem("TRACE", message)
+func Debug(message string) {
+	NewLogger().addItem("DEBUG", message)
 }
 
-func (log *Logger) Debug(message string) {
-	log.addItem("DEBUG", message)
+func Info(message string) {
+	NewLogger().addItem("INFO", message)
 }
 
-func (log *Logger) Info(message string) {
-	log.addItem("INFO", message)
+func Warning(message string) {
+	NewLogger().addItem("WARNING", message)
 }
 
-func (log *Logger) Warning(message string) {
-	log.addItem("WARNING", message)
+func Error(message string) {
+	NewLogger().addItem("ERROR", message)
 }
 
-func (log *Logger) Error(message string) {
-	log.addItem("ERROR", message)
-}
-
-func (log *Logger) Fatal(message string) {
-	log.addItem("FATAL", message)
+func Fatal(message string) {
+	NewLogger().addItem("FATAL", message)
 	file, _ := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	defer file.Close()
-	for _, item := range log.items {
+	for _, item := range NewLogger().items {
 		file.WriteString(item.Time.Format("2024-01-01 12:00:00") + " " + item.Level + " " + item.Message + "\n")
 	}
 	os.Exit(1)
