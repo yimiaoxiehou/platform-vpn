@@ -1,3 +1,3 @@
-cmd/cmd.exe
+cli/*.exe
 build/bin
 vendor/
