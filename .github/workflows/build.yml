@@ -14,13 +14,16 @@ jobs:
         build: [
           {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
           {name: platform-vpn-windows, platform: windows/amd64, os: windows-latest},
-          {name: platform-vpn-darwin, platform: darwin/universal, os: macos-latest}
+          {name: platform-vpn-darwin.app, platform: darwin/universal, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Install Linux Wails deps
+        if: inputs.build == 'true' && runner.os == 'Linux' && inputs.ubuntu24 == ''
+        run: echo "deb http://ftp.de.debian.org/debian bookworm main" | sudo tee /etc/apt/sources.list.d/debian-bookworm-main.list && sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
       - name: Build wails
         uses: dAppServer/wails-build-action@main
         with:
