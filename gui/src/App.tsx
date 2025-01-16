@@ -50,7 +50,7 @@ const App: React.FC = () => {
           textAlign: 'right',
         }}
       >
-        <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN</h2>
+        <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN v1.2</h2>
         <Menu
           theme="dark"
           style={{ background: 'transparent', fontWeight: 'bold' }}
