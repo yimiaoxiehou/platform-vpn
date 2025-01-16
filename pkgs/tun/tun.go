@@ -47,7 +47,13 @@ func StopTun() error {
 	tunnel.OnSuspend()
 	mlog.UnSubscribe(mlogSub)
 	closeTunListener()
-	return utils.CleanPlatformHosts()
+	err := utils.CleanPlatformHosts()
+	times := 3
+	for err != nil && times > 0 {
+		times--
+		err = utils.CleanPlatformHosts()
+	}
+	return err
 }
 
 func StartTun(config TunConfig) error {
