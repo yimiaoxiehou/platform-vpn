@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
+          {name: platform-vpn-linux, platform: linux/amd64, os: debian-latest},
           {name: platform-vpn-windows, platform: windows/amd64, os: windows-latest},
           {name: platform-vpn-darwin.app, platform: darwin/universal, os: macos-latest}
         ]
@@ -21,17 +21,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Install Linux Wails deps1
-        if: matrix.build.os == 'ubuntu-latest'
-        run: echo "deb http://ftp.de.debian.org/debian bookworm main" | sudo tee /etc/apt/sources.list.d/debian-bookworm-main.list && \
-             sudo apt-get update -y && sudo apt-get install -y debian-keyring debian-archive-keyring gnupg
-      - name: Install Linux Wails deps2
-        if: matrix.build.os == 'ubuntu-latest'
-        run: sudo gpg --keyserver keyserver.ubuntu.com --recv-key F8D2585B8783D481 && \
-             sudo gpg --keyserver keyserver.ubuntu.com --recv-key 6ED0E7B82643E131 && \
-             sudo gpg --keyserver keyserver.ubuntu.com --recv-key 0E98404D386FA1D9
-      - name: Install Linux Wails deps3
-        if: matrix.build.os == 'ubuntu-latest'
+      - name: Install Linux Wails deps
+        if: matrix.build.os == 'debian-latest'
         run: sudo apt-get update -y && sudo apt-get install -y libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
       - name: Build wails
         uses: dAppServer/wails-build-action@main
