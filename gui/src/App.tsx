@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import { Button, ConfigProvider, Layout, Menu } from 'antd';
+import { ConfigProvider, Layout, Menu } from 'antd';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Log from './pages/log';
 import { Home } from './pages/home';
@@ -87,7 +87,7 @@ const App: React.FC = () => {
             }}
           />
         </div>
-       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: 1.0.0<br/>2025-01-16 16:41:17</span>
+       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: 1.0.0<br/>2025-01-16 16:46:52</span>
       </Sider>
       <Layout style={{ marginLeft: 200 }} >
         <Content
