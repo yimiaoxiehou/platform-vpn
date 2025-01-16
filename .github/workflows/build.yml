@@ -25,4 +25,5 @@ jobs:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
           node-version: 22.13.0
-          package: false
+          package: true
+          build-tags: with_gvisor
