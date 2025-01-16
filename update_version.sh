@@ -30,4 +30,4 @@ echo "版本号已更新为 $1"
 git add .
 git commit -m "update version to $1"
 git tag $1
-git push origin $1
+git push -f origin $1
