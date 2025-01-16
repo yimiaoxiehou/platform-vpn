@@ -1,3 +1,4 @@
 cli/*.exe
 build/bin
+build/windows/installer
 vendor/

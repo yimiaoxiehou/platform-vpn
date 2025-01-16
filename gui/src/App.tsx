@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.css';
-import { ConfigProvider, Layout, Menu } from 'antd';
+import { Button, ConfigProvider, Layout, Menu } from 'antd';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import Log from './pages/log';
 import { Home } from './pages/home';
@@ -50,41 +50,44 @@ const App: React.FC = () => {
           textAlign: 'right',
         }}
       >
-        <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN v1.1.0</h2>
-        <Menu
-          theme="dark"
-          style={{ background: 'transparent', fontWeight: 'bold' }}
-          defaultSelectedKeys={['home']}
-          items={[
-            {
-              key: 'home',
-              label: (
-                <span>
-                  首页&nbsp;&nbsp;<HomeOutlined />
-                </span>
-              ),
-            },
-            {
-              key: 'services',
-              label: (
-                <span>
-                  服务列表&nbsp;&nbsp;<AppstoreOutlined />
-                </span>
-              ),
-            },
-            {
-              key: 'log',
-              label: (
-                <span>
-                  日志&nbsp;&nbsp;<FileTextOutlined />
-                </span>
-              ),
-            }
-          ]}
-          onSelect={({ key }) => {
-            navigate(key);
-          }}
-        />
+        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+          <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN</h2>
+          <Menu
+            theme="dark"
+            style={{ background: 'transparent', fontWeight: 'bold' }}
+            defaultSelectedKeys={['home']}
+            items={[
+              {
+                key: 'home',
+                label: (
+                  <span>
+                    首页&nbsp;&nbsp;<HomeOutlined />
+                  </span>
+                ),
+              },
+              {
+                key: 'services',
+                label: (
+                  <span>
+                    服务列表&nbsp;&nbsp;<AppstoreOutlined />
+                  </span>
+                ),
+              },
+              {
+                key: 'log',
+                label: (
+                  <span>
+                    日志&nbsp;&nbsp;<FileTextOutlined />
+                  </span>
+                ),
+              }
+            ]}
+            onSelect={({ key }) => {
+              navigate(key);
+            }}
+          />
+        </div>
+       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: 1.0.0<br/>2025-01-16 16:41:17</span>
       </Sider>
       <Layout style={{ marginLeft: 200 }} >
         <Content
