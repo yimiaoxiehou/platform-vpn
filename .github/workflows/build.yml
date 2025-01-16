@@ -1,6 +1,10 @@
 name: Wails build
 
-on: [pull_request]
+on:
+  push:
+    tags:
+    # Match any new tag
+      - '*'
 
 jobs:
   build:
@@ -21,3 +25,11 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           node-version: 22.13.0
           package: true
+
+      - name: Build wails
+        uses: dAppServer/wails-build-action@v2.2
+        id: build
+        with:
+          build-name: ${{ matrix.build.name }}
+          build-platform: ${{ matrix.build.platform }}
+          package: false
