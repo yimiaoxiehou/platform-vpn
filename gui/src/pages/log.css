@@ -1,0 +1,10 @@
+.log-container {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: Consolas, monospace;
+    text-align: left;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
