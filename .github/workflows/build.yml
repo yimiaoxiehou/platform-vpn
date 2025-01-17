@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          {name: platform-vpn-linux, platform: linux/amd64, os: debian-latest},
+          {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
           {name: platform-vpn-windows, platform: windows/amd64, os: windows-latest},
           {name: platform-vpn-darwin.app, platform: darwin/universal, os: macos-latest}
         ]
