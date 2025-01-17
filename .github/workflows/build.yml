@@ -13,7 +13,7 @@ jobs:
       matrix:
         build: [
           {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
-          {name: platform-vpn-windows, platform: windows/amd64, os: windows-latest},
+          {name: platform-vpn-windows.exe, platform: windows/amd64, os: windows-latest},
           {name: platform-vpn, platform: darwin/universal, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
