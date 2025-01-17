@@ -23,7 +23,7 @@ jobs:
           submodules: recursive
 
       - name: Build wails
-        uses: yimiaoxiehou/wails-build-action@main
+        uses: stxh/wails-build-action@pr
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
