@@ -30,4 +30,3 @@ jobs:
           node-version: 22.13.0
           package: true
           build-tags: with_gvisor
-          ubuntu24: true
