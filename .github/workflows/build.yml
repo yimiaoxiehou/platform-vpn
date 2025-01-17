@@ -14,7 +14,7 @@ jobs:
         build: [
           {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
           {name: platform-vpn-windows, platform: windows/amd64, os: windows-latest},
-          {name: platform-vpn-darwin.app, platform: darwin/universal, os: macos-latest}
+          {name: platform-vpn-darwin, platform: darwin/universal, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
