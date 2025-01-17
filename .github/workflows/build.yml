@@ -22,8 +22,19 @@ jobs:
         with:
           submodules: recursive
       - name: Install Linux Wails deps
-        if: matrix.build.os == 'debian-latest'
-        run: sudo apt-get update -y && sudo apt-get install -y libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+        if: matrix.build.os == 'ubuntu-latest'
+        run: sudo apt-get update -y && sudo apt-get install -y libwebkit2gtk-4.1-dev
+      
+      - name: Build wails
+        uses: dAppServer/wails-build-action@main
+        with:
+          build-name: ${{ matrix.build.name }}
+          build-platform: ${{ matrix.build.platform }}
+          node-version: 22.13.0
+          package: true
+          build-tags: with_gvisor,webkit2_41
+
+      
       - name: Build wails
         uses: dAppServer/wails-build-action@main
         with:
