@@ -26,8 +26,6 @@ type Client struct {
 }
 
 var _client Client
-var header = "## Platform START\n"
-var end = "## Platform END\n"
 
 func NewClient(host string, port int, user string, password string) (*Client, error) {
 	if _client.SSHClient != nil {
@@ -105,7 +103,7 @@ func (c *Client) GetServiceHosts() (string, error) {
 		return "", err
 	}
 
-	k8sHosts := header
+	k8sHosts := utils.HOST_START
 
 	nsHosts := make(map[string]map[string]string)
 	for ns, svcs := range nsSvcs {
@@ -142,7 +140,7 @@ func (c *Client) GetServiceHosts() (string, error) {
 		k8sHosts += fmt.Sprintf("%s\t%s\n", host, name)
 	}
 
-	k8sHosts = k8sHosts + end
+	k8sHosts = k8sHosts + utils.HOST_END
 	return k8sHosts, nil
 }
 

@@ -17,7 +17,15 @@ func StopVPN() error {
 	if updateHostsTicker != nil {
 		updateHostsTicker.Stop()
 	}
-	return tun.StopTun()
+	tun.StopTun()
+	err := utils.CleanPlatformHosts()
+	times := 3
+	for err != nil && times > 0 {
+		times--
+		time.Sleep(time.Second)
+		err = utils.CleanPlatformHosts()
+	}
+	return err
 }
 
 var updateHostsTicker *time.Ticker
