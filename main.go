@@ -54,6 +54,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 		},
+		
 		LogLevel:           logger.INFO,
 		LogLevelProduction: logger.INFO,
 		DisableResize:      true,

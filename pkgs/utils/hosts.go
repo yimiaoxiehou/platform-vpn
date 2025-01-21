@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"sync"
 )
 
-var hostsMutex sync.Mutex
+var HOST_START = "## Platform START\n"
+var HOST_END = "## Platform END\n"
 
 // GetHostsFilePath 返回系统 hosts 文件的路径
 func GetSystemHostsPath() string {
@@ -27,21 +27,20 @@ func getCleaningHosts() (*bytes.Buffer, error) {
 		return hosts, err
 	}
 	hostsStr := string(hostsBytes)
-	header := "\n\n\n## Platform START\n\n\n"
-	end := "\n\n\n## Platform END\n\n\n"
 
-	platformHostStartIdx := strings.Index(hostsStr, header)
+	platformHostStartIdx := strings.Index(hostsStr, HOST_START)
 	if platformHostStartIdx == -1 {
 		hosts.WriteString(string(hostsBytes))
 		return hosts, err
 	}
 
-	platformHostEndIdx := strings.Index(hostsStr, end)
+	platformHostEndIdx := strings.Index(hostsStr, HOST_END)
 	if platformHostEndIdx == -1 {
 		hosts.WriteString(string(hostsBytes))
 		return hosts, err
 	}
-	hostsStr = hostsStr[0:platformHostStartIdx] + hostsStr[platformHostEndIdx+len(end):]
+	hostsStr = hostsStr[0:platformHostStartIdx]
+	hostsStr = strings.TrimSpace(hostsStr)
 
 	_, err = hosts.Write([]byte(hostsStr))
 	return hosts, err
@@ -49,14 +48,11 @@ func getCleaningHosts() (*bytes.Buffer, error) {
 
 // UpdatePlatformHosts 更新平台 Hosts 文件
 func UpdatePlatformHosts(appendHosts string) error {
-	hostsMutex.Lock()
-	defer hostsMutex.Unlock()
-
 	hosts, err := getCleaningHosts()
 	if err != nil {
 		return err
 	}
-	_, err = hosts.WriteString(appendHosts)
+	_, err = hosts.WriteString("\n" + appendHosts)
 	if err != nil {
 		return err
 	}
@@ -64,9 +60,6 @@ func UpdatePlatformHosts(appendHosts string) error {
 }
 
 func CleanPlatformHosts() error {
-	hostsMutex.Lock()
-	defer hostsMutex.Unlock()
-
 	hosts, err := getCleaningHosts()
 	if err != nil {
 		return err

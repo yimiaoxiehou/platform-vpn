@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"net/netip"
 	"platform-vpn/pkgs/log"
-	"platform-vpn/pkgs/utils"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/outbound"
@@ -45,18 +43,10 @@ type TunConfig struct {
 
 var mlogSub observable.Subscription[mlog.Event]
 
-func StopTun() error {
+func StopTun() {
 	tunnel.OnSuspend()
 	defer mlog.UnSubscribe(mlogSub)
 	closeTunListener()
-	err := utils.CleanPlatformHosts()
-	times := 3
-	for err != nil && times > 0 {
-		times--
-		time.Sleep(time.Second)
-		err = utils.CleanPlatformHosts()
-	}
-	return err
 }
 
 func StartTun(config TunConfig) error {
