@@ -16,7 +16,7 @@ require (
 
 require (
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
-	github.com/metacubex/mihomo v1.19.0
+	github.com/metacubex/mihomo v1.19.1
 	github.com/qdm12/dns/v2 v2.0.0-rc8.0.20241104163901-111c6a1be760
 	github.com/showa-93/go-mask v0.6.2
 	github.com/wailsapp/wails/v2 v2.9.2
@@ -35,6 +35,7 @@ require (
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/coreos/go-iptables v0.8.0 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
+	github.com/ebitengine/purego v0.8.1 // indirect
 	github.com/enfein/mieru/v3 v3.9.0 // indirect
 	github.com/ericlagergren/aegis v0.0.0-20230312195928-b4ce538b56f9 // indirect
 	github.com/ericlagergren/polyval v0.0.0-20220411101811-e25bc10ba391 // indirect
@@ -125,8 +126,7 @@ require (
 	github.com/sagernet/sing-mux v0.2.1 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.5 // indirect
 	github.com/sagernet/smux v0.0.0-20231208180855-7041f6ea79e7 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
-	github.com/shoenig/go-m1cpu v0.1.6 // indirect
+	github.com/shirou/gopsutil/v4 v4.24.11 // indirect
 	github.com/sina-ghaderi/poly1305 v0.0.0-20220724002748-c5926b03988b // indirect
 	github.com/sina-ghaderi/rabaead v0.0.0-20220730151906-ab6e06b96e8c // indirect
 	github.com/sina-ghaderi/rabbitio v0.0.0-20220730151941-9ce26f4f872e // indirect
@@ -164,7 +164,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-
-replace github.com/metacubex/mihomo => ./mihomo
-
-// replace github.com/wailsapp/wails/v2 v2.9.2 => /Users/yimiao/go/pkg/mod
