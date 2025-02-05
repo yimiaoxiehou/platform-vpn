@@ -50,41 +50,44 @@ const App: React.FC = () => {
           textAlign: 'right',
         }}
       >
-        <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN</h2>
-        <Menu
-          theme="dark"
-          style={{ background: 'transparent', fontWeight: 'bold' }}
-          defaultSelectedKeys={['home']}
-          items={[
-            {
-              key: 'home',
-              label: (
-                <span>
-                  首页&nbsp;&nbsp;<HomeOutlined />
-                </span>
-              ),
-            },
-            {
-              key: 'services',
-              label: (
-                <span>
-                  服务列表&nbsp;&nbsp;<AppstoreOutlined />
-                </span>
-              ),
-            },
-            {
-              key: 'log',
-              label: (
-                <span>
-                  日志&nbsp;&nbsp;<FileTextOutlined />
-                </span>
-              ),
-            }
-          ]}
-          onSelect={({ key }) => {
-            navigate(key);
-          }}
-        />
+        <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+          <h2 className="mb-2 px-4 text-lg font-semibold" style={{ color: 'white' }}>Platform VPN</h2>
+          <Menu
+            theme="dark"
+            style={{ background: 'transparent', fontWeight: 'bold' }}
+            defaultSelectedKeys={['home']}
+            items={[
+              {
+                key: 'home',
+                label: (
+                  <span>
+                    首页&nbsp;&nbsp;<HomeOutlined />
+                  </span>
+                ),
+              },
+              {
+                key: 'services',
+                label: (
+                  <span>
+                    服务列表&nbsp;&nbsp;<AppstoreOutlined />
+                  </span>
+                ),
+              },
+              {
+                key: 'log',
+                label: (
+                  <span>
+                    日志&nbsp;&nbsp;<FileTextOutlined />
+                  </span>
+                ),
+              }
+            ]}
+            onSelect={({ key }) => {
+              navigate(key);
+            }}
+          />
+        </div>
+       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: v1.1.1<br/>2025-01-21 11:36:32</span>
       </Sider>
       <Layout style={{ marginLeft: 200 }} >
         <Content

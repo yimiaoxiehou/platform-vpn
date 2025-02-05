@@ -1,0 +1,32 @@
+name: Wails build
+
+on:
+  push:
+    tags:
+    # Match any new tag
+      - '*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [
+          {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
+          {name: platform-vpn-windows.exe, platform: windows/amd64, os: windows-latest},
+          {name: platform-vpn, platform: darwin/universal, os: macos-latest}
+        ]
+    runs-on: ${{ matrix.build.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Build wails
+        uses: yimiaoxiehou/wails-build-action@main
+        with:
+          build-name: ${{ matrix.build.name }}
+          build-platform: ${{ matrix.build.platform }}
+          node-version: 22.13.0
+          package: true
+          build-tags: with_gvisor

@@ -2,8 +2,8 @@
   "$schema": "https://wails.io/schemas/config.v2.json",
   "name": "platform-vpn",
   "outputfilename": "platform-vpn",
-  "frontend:dir": "./front",
-  "assetdir": "../front/dist",
+  "frontend:dir": "./gui",
+  "assetdir": "../gui/dist",
   "frontend:install": "yarn",
   "frontend:build": "yarn build",
   "frontend:dev:watcher": "yarn dev",
@@ -15,6 +15,6 @@
   "info": {
     "companyName": "yimiao",
     "productName": "platform-vpn",
-    "productVersion": "1.0.0"
+    "productVersion": "v1.1.1"
   }
 }
