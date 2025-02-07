@@ -164,3 +164,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
+
+// replace github.com/metacubex/mihomo => ./mihomo
+
+// replace github.com/wailsapp/wails/v2 v2.9.2 => /Users/yimiao/go/pkg/mod
