@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/netip"
 	"platform-vpn/pkgs/log"
-	"platform-vpn/pkgs/utils"
 	"strconv"
 	"strings"
 	"sync"
@@ -16,6 +15,7 @@ import (
 	LC "github.com/metacubex/mihomo/listener/config"
 	"github.com/metacubex/mihomo/listener/sing_tun"
 	mlog "github.com/metacubex/mihomo/log"
+	"github.com/metacubex/mihomo/rules"
 	"github.com/metacubex/mihomo/tunnel"
 )
 
@@ -43,11 +43,10 @@ type TunConfig struct {
 
 var mlogSub observable.Subscription[mlog.Event]
 
-func StopTun() error {
+func StopTun() {
 	tunnel.OnSuspend()
-	mlog.UnSubscribe(mlogSub)
+	defer mlog.UnSubscribe(mlogSub)
 	closeTunListener()
-	return utils.CleanPlatformHosts()
 }
 
 func StartTun(config TunConfig) error {
@@ -73,7 +72,7 @@ func StartTun(config TunConfig) error {
 		StrictRoute: true,
 		Device:      config.Device,
 		Inet4Address: []netip.Prefix{
-			netip.PrefixFrom(netip.MustParseAddr(config.Inet4Addr), 16),
+			netip.PrefixFrom(netip.MustParseAddr(config.Inet4Addr), 24),
 		},
 		RouteAddress: make([]netip.Prefix, 0, len(config.RouteAddrs)),
 		AutoRedirect: true,
@@ -98,8 +97,10 @@ func StartTun(config TunConfig) error {
 		UserName: config.SSHUser,
 		Password: config.SSHPassword,
 	})
-	proxies["DIRECT"] = adapter.NewProxy(sshProxy)
+	proxies["DIRECT"] = adapter.NewProxy(outbound.NewDirect())
+	proxies["PROXY"] = adapter.NewProxy(sshProxy)
 	tunnel.UpdateProxies(proxies, nil)
+	AddIPCIDRRule(config.RouteAddrs)
 	err := ReCreateTun(tunConf, Tunnel)
 	if err != nil {
 		return err
@@ -150,4 +151,17 @@ func closeTunListener() {
 
 func Cleanup() {
 	closeTunListener()
+}
+
+func AddIPCIDRRule(ipCidrs []string) {
+	proxyRules := make([]C.Rule, 0, len(ipCidrs))
+	for _, ipCidr := range ipCidrs {
+		log.Info(fmt.Sprintf("Add IPCIDR rule: %s", ipCidr))
+		proxyRule, parseErr := rules.ParseRule("IP-CIDR", ipCidr, "PROXY", []string{}, nil)
+		if parseErr != nil {
+			log.Error(fmt.Sprintf("Add IPCIDR rule error: %s", parseErr.Error()))
+		}
+		proxyRules = append(proxyRules, proxyRule)
+	}
+	tunnel.UpdateRules(proxyRules, nil, nil)
 }

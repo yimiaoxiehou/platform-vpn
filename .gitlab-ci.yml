@@ -1,0 +1,31 @@
+# 构建阶段任务，负责编译应用程序
+cache:
+  paths:
+  - gui/dist
+  # 已项目 id 区分 cache，如果不区分，就是全局 cache
+  key: $CI_PROJECT_ID
+
+build-front:
+  stage: build
+  # 使用预配置的 Wails 构建环境镜像
+  image: "docker.utpf.cn/docker.io/jitesoft/node-yarn:22"
+  script:
+    - cd gui && yarn && yarn build && cd ..
+
+build:
+  stage: build
+  # 使用预配置的 Wails 构建环境镜像
+  image: docker.utpf.cn/docker.io/yimiaoxiehou/wails-builder:slim
+  needs:
+    - build-front
+  script:
+    - export TAG=$(cat wails.json | jq -r .info.productVersion)
+    - go env -w GOPROXY="https://developer.utpf.cn/goproxy/"
+    - go install github.com/wailsapp/wails/v2/cmd/wails@latest
+    # 构建 Windows AMD64 版本，启用 gvisor 和调试模式
+    - wails build -s -skipbindings -platform windows/amd64 -tags with_gvisor -o platform-vpn-win64-$TAG.exe
+    - wails build -s -skipbindings -platform linux/amd64 -tags with_gvisor -o platform-vpn-linux64-$TAG
+  artifacts:
+    name: platform-vpn
+    paths:
+      - build/bin
