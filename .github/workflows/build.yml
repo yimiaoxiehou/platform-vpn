@@ -14,7 +14,7 @@ jobs:
         build: [
           {name: platform-vpn-linux, platform: linux/amd64, os: ubuntu-latest},
           {name: platform-vpn-windows.exe, platform: windows/amd64, os: windows-latest},
-          {name: platform-vpn, platform: darwin/universal, os: macos-latest}
+          {name: platform-vpn, platform: darwin/arm64, os: macos-latest}
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
@@ -23,10 +23,10 @@ jobs:
           submodules: recursive
 
       - name: Build wails
-        uses: dAppServer/wails-build-action@main
+        uses: yimiaoxiehou/wails-build-action@main
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
           node-version: 22.13.0
           package: true
-          build-tags: with_gvisor
+          build-tags: with_gvisor,webkit2_41
