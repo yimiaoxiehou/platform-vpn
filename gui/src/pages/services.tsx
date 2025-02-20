@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, message, Tag, Layout, Input, Space, Row, Col } from 'antd';
+import { Card, Spin, message, Tag, Layout, Input, Space, Row, Col, Button } from 'antd';
 import { GetServices } from "../../wailsjs/go/main/App";
 import { main } from "../../wailsjs/go/models";
 
 import { BrowserOpenURL, ClipboardSetText } from '../../wailsjs/runtime';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Content, Header } from 'antd/es/layout/layout';
 
 const Services: React.FC = () => {
@@ -116,17 +116,42 @@ const Services: React.FC = () => {
           height: '56px',
           boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
         }}
+      // 在 Header 组件内部修改为
       >
-        <Input
-          placeholder="搜索服务..."
-          allowClear
-          prefix={<SearchOutlined style={{ color: '#00000040' }} />}
-          style={{
-            maxWidth: 300,
-            borderRadius: 4,
-          }}
-          onChange={(e) => filter(e.target.value)}
-        />
+        <Space>
+          <Input
+            placeholder="搜索服务..."
+            allowClear
+            prefix={<SearchOutlined style={{ color: '#00000040' }} />}
+            style={{
+              maxWidth: 300,
+              borderRadius: 4,
+            }}
+            onChange={(e) => filter(e.target.value)}
+          />
+          <Button
+            icon={<ReloadOutlined />}
+            style={{
+              border: 'none'
+            }}
+            onClick={() => {
+              setLoading(true);
+              GetServices()
+                .then((services) => {
+                  services.sort((a, b) => a.Namespace.localeCompare(b.Namespace));
+                  setInitNsServices(services);
+                  setNsServices(services);
+                  message.success('刷新成功');
+                })
+                .catch(() => {
+                  message.error('获取服务失败');
+                })
+                .finally(() => {
+                  setLoading(false);
+                });
+            }}
+          />
+        </Space>
       </Header>
       <Content
         style={{

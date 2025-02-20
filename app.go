@@ -42,6 +42,7 @@ type VPNConfig struct {
 	Port            int
 	Password        string
 	RefreshInterval int
+	TunStackMode    int
 }
 
 // NewApp creates a new App application struct
@@ -57,7 +58,7 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) StartVPN(config *VPNConfig) (bool, string) {
 
-	err := vpn.StartVPN(config.User, config.Password, config.Server, config.Port, time.Duration(config.RefreshInterval)*time.Minute)
+	err := vpn.StartVPN(config.User, config.Password, config.Server, config.Port, time.Duration(config.RefreshInterval)*time.Minute, config.TunStackMode)
 	if err != nil {
 		return false, fmt.Sprintf("连接 VPN 服务器[%s]失败: %v", config.Server, err)
 	}

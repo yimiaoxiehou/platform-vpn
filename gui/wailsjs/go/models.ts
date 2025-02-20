@@ -95,6 +95,7 @@ export namespace main {
 	    Port: number;
 	    Password: string;
 	    RefreshInterval: number;
+	    TunStackMode: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new VPNConfig(source);
@@ -107,6 +108,7 @@ export namespace main {
 	        this.Port = source["Port"];
 	        this.Password = source["Password"];
 	        this.RefreshInterval = source["RefreshInterval"];
+	        this.TunStackMode = source["TunStackMode"];
 	    }
 	}
 

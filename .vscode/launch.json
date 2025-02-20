@@ -6,7 +6,7 @@
         "type": "go",
         "request": "launch",
         "mode": "auto",
-        "program": "${workspaceFolder}/cmd",
+        "program": "${workspaceFolder}/cli",
         "buildFlags": ["-tags=with_gvisor"],
         "asRoot": true,
         "console": "integratedTerminal"

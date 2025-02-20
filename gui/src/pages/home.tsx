@@ -9,12 +9,13 @@ export const Home = () => {
     return storedConfig
       ? new main.VPNConfig(JSON.parse(storedConfig))
       : new main.VPNConfig({
-          Server: '',
-          User: 'root',
-          Port: 22,
-          Password: '',
-          RefreshInterval: 1,
-        });
+        Server: '',
+        User: 'root',
+        Port: 22,
+        Password: '',
+        RefreshInterval: 1,
+        TunStackMode: 0,  // 添加默认值
+      });
   });
 
   useEffect(() => {
@@ -41,6 +42,12 @@ export const Home = () => {
     { label: '30分钟', value: 30 },
   ];
 
+  const tunStackModeOptions = [
+    { label: 'GVisor', value: 0 },
+    { label: 'System', value: 1 },
+    { label: 'Mixed', value: 2 },
+  ];
+
   const handleChange = (field: keyof main.VPNConfig) => (value: string) => {
     setConfig((prev) => ({
       ...prev,
@@ -54,6 +61,15 @@ export const Home = () => {
       RefreshInterval: value,
     }));
   };
+
+
+  const handleTunStackModeChange = (value: number) => {
+    setConfig((prev) => ({
+      ...prev,
+      TunStackMode: value,
+    }));
+  };
+
 
   const toggleOpenHosts = () => {
     OpenHosts()
@@ -127,51 +143,65 @@ export const Home = () => {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
       <Form layout="vertical" style={{ maxWidth: '600px', padding: '15px', gap: '15px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <Form.Item label="服务器ip">
+          <Row>
+            <Col>
+              <Form.Item label="服务器ip">
+                <Input
+                  disabled={isVPNActive}
+                  style={{ width: '135px' }}
+                  value={config.Server}
+                  onChange={(e) => handleChange('Server')(e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item label="ssh端口">
+                <Input
+                  disabled={isVPNActive}
+                  type='number'
+                  style={{ width: '70px' }}
+                  value={config.Port}
+                  onChange={(e) => handleChange('Port')(e.target.value)}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item label="ssh账户">
             <Input
               allowClear
               disabled={isVPNActive}
               style={{ width: '200px' }}
-              value={config.Server}
-              onChange={(e) => handleChange('Server')(e.target.value)}
+              value={config.User}
+              onChange={(e) => handleChange('User')(e.target.value)}
             />
-        </Form.Item>
-        <Form.Item label="ssh账户">
-          <Input
-            allowClear
-            disabled={isVPNActive}
-            style={{ width: '200px' }}
-            value={config.User}
-            onChange={(e) => handleChange('User')(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="ssh端口">
-          <Input
-            allowClear
-            disabled={isVPNActive}
-            style={{ width: '200px' }}
-            value={config.Port}
-            onChange={(e) => handleChange('Port')(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="ssh密码">
-          <Input.Password
-            allowClear
-            disabled={isVPNActive}
-            style={{ width: '200px' }}
-            value={config.Password}
-            onChange={(e) => handleChange('Password')(e.target.value)}
-          />
-        </Form.Item>
-        <Form.Item label="hosts 刷新间隔">
-          <Select
-            style={{ width: '200px' }}
-            disabled={isVPNActive}
-            value={config.RefreshInterval}
-            onChange={handleDropdownChange}
-            options={refreshIntervalOptions}
-          />
-        </Form.Item>
+          </Form.Item>
+          <Form.Item label="ssh密码">
+            <Input.Password
+              allowClear
+              disabled={isVPNActive}
+              style={{ width: '200px' }}
+              value={config.Password}
+              onChange={(e) => handleChange('Password')(e.target.value)}
+            />
+          </Form.Item>
+          <Form.Item label="hosts 刷新间隔">
+            <Select
+              style={{ width: '200px' }}
+              disabled={isVPNActive}
+              value={config.RefreshInterval}
+              onChange={handleDropdownChange}
+              options={refreshIntervalOptions}
+            />
+          </Form.Item>
+          <Form.Item label="Tun 堆栈类型">
+            <Select
+              style={{ width: '200px' }}
+              disabled={isVPNActive}
+              value={config.TunStackMode}
+              onChange={handleTunStackModeChange}
+              options={tunStackModeOptions}
+            />
+          </Form.Item>
         </div>
         <Form.Item>
           <Row justify="center" gutter={10}>
