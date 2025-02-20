@@ -21,7 +21,7 @@ build:
   script:
     - export TAG=$(cat wails.json | jq -r .info.productVersion)
     - go env -w GOPROXY="https://developer.utpf.cn/goproxy/"
-    - go install github.com/wailsapp/wails/v2/cmd/wails@latest
+    - go install github.com/wailsapp/wails/v2/cmd/wails@v2.9
     # 构建 Windows AMD64 版本，启用 gvisor 和调试模式
     - wails build -s -platform linux/amd64 -tags with_gvisor -o platform-vpn-linux64-$TAG
     - wails build -s -platform windows/amd64 -tags with_gvisor -o platform-vpn-win64-$TAG.exe
