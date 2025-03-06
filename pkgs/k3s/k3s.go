@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"platform-vpn/pkgs/utils"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 
@@ -55,20 +56,56 @@ func (c *Client) remoteExec(cmd string) ([]byte, error) {
 	return output, nil
 }
 
-func (c *Client) GetK3sConfig() (RancherK3sConfig, error) {
+func (c *Client) GetCidrs() ([]string, error) {
+	cidrs := make([]string, 0)
 	var newConfig RancherK3sConfig
-
 	output, err := c.remoteExec("cat /etc/rancher/k3s/config.yaml")
+	clusterCidr := ""
+	serviceCidr := ""
 	if err != nil {
-		return newConfig, err
+		var serviceCFG *utils.ServiceConfig
+		output, err = c.remoteExec("cat /etc/systemd/system/k3s.service")
+		if err != nil {
+			return cidrs, err
+		}
+		serviceCFG, err = utils.ParseServiceFile(string(output))
+		execStartCMD := serviceCFG.Service["ExecStart"]
+		cmds := strings.Split(execStartCMD, " ")
+		pureCmds := make([]string, 0)
+		for _, cmd := range cmds {
+			cmd = strings.TrimSpace(cmd)
+			cmd = strings.Trim(cmd, "'")
+			cmd = strings.Trim(cmd, "\"")
+			cmd = strings.TrimSpace(cmd)
+			if cmd != "" {
+				pureCmds = append(pureCmds, cmd)
+			}
+		}
+		cmds = pureCmds
+		for i, cmd := range cmds {
+			if cmd == "--cluster-cidr" && i < len(cmds)-1 {
+				clusterCidr = cmds[i+1]
+			}
+			if cmd == "--service-cidr" && i < len(cmds)-1 {
+				serviceCidr = cmds[i+1]
+			}
+		}
+		if clusterCidr != "" {
+			cidrs = append(cidrs, clusterCidr)
+		}
+		if serviceCidr != "" {
+			cidrs = append(cidrs, serviceCidr)
+		}
+		return cidrs, nil
 	}
-
 	// 从 YAML 反序列化
 	err = yaml.Unmarshal(output, &newConfig)
 	if err != nil {
 		fmt.Printf("反序列化失败: %v\n", err)
 	}
-	return newConfig, nil
+	cidrs = append(cidrs, newConfig.ClusterCIDR)
+	cidrs = append(cidrs, newConfig.ServiceCIDR)
+	return cidrs, nil
 }
 
 func (c *Client) GetNsServices() (map[string][]corev1.Service, error) {

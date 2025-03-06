@@ -46,7 +46,7 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 		return err
 	}
 
-	config, err := k3sClinet.GetK3sConfig()
+	routeCidrs, err := k3sClinet.GetCidrs()
 	if err != nil {
 		return err
 	}
@@ -72,16 +72,15 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 		netip.PrefixFrom(netip.MustParseAddr("10.10.0.1"), 30),
 	}
 	clashConfig.General.Tun.Inet6Address = []netip.Prefix{}
-	routeAddrs := []string{config.ClusterCIDR, config.ServiceCIDR}
 	// 转换路由地址
-	for _, addr := range routeAddrs {
+	for _, addr := range routeCidrs {
 		prefix := strings.Split(addr, "/")
 		mask, _ := strconv.Atoi(prefix[1])
 		clashConfig.General.Tun.RouteAddress = append(clashConfig.General.Tun.RouteAddress,
 			netip.PrefixFrom(netip.MustParseAddr(prefix[0]), int(mask)))
 	}
 	clashConfig.DNS.Enable = false
-	clashConfig.Rules = AddIPCIDRRule([]string{config.ClusterCIDR, config.ServiceCIDR})
+	clashConfig.Rules = AddIPCIDRRule(routeCidrs)
 	clashConfig.Proxies = proxies
 	executor.ApplyConfig(clashConfig, true)
 	// 首次立即执行一次
