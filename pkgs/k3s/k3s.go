@@ -184,3 +184,21 @@ func (c *Client) GetServiceHosts() (string, error) {
 func GetServices() (map[string][]corev1.Service, error) {
 	return _client.GetNsServices()
 }
+
+func GetNamespaces() ([]string, error) {
+	var namespaceList corev1.NamespaceList
+	output, err := _client.remoteExec("k3s kubectl get ns -o json")
+	if err != nil {
+		return []string{}, err
+	}
+
+	// 解析 JSON 数据
+	if err := json.Unmarshal(output, &namespaceList); err != nil {
+		return []string{}, fmt.Errorf("解析命名空间列表失败: %v", err)
+	}
+	namespaces := make([]string, len(namespaceList.Items))
+	for i, ns := range namespaceList.Items {
+		namespaces[i] = ns.Name
+	}
+	return namespaces, nil
+}

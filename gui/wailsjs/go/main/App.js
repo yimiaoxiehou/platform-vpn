@@ -6,6 +6,10 @@ export function GetLogs() {
   return window['go']['main']['App']['GetLogs']();
 }
 
+export function GetNamespaces() {
+  return window['go']['main']['App']['GetNamespaces']();
+}
+
 export function GetServices() {
   return window['go']['main']['App']['GetServices']();
 }

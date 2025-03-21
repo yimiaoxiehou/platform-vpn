@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin, message, Tag, Layout, Input, Space, Row, Col, Button } from 'antd';
-import { GetServices } from "../../wailsjs/go/main/App";
+import { Card, Spin, message, Tag, Layout, Input, Space, Row, Col, Button, Select, SelectProps } from 'antd';
+import { GetNamespaces, GetServices } from "../../wailsjs/go/main/App";
 import { main } from "../../wailsjs/go/models";
 
 import { BrowserOpenURL, ClipboardSetText } from '../../wailsjs/runtime';
@@ -11,32 +11,89 @@ const Services: React.FC = () => {
   const [nsServices, setNsServices] = useState<Array<main.AppNsService>>([]);
   const [initNsServices, setInitNsServices] = useState<Array<main.AppNsService>>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  // 添加 namespaces 状态
+  const [namespaces, setNamespaces] = useState<SelectProps['options']>();
+  // 将 filterNamespaces 也转换为状态
+  const [filterNamespaces, setFilterNamespaces] = useState<string[]>(['default']);
 
   const [isVPNActive] = useState<boolean>(() => {
-    const stored = localStorage.getItem('isVPNActive');
-    return stored === 'true';
+    return localStorage.getItem('isVPNActive') === 'true';
   });
 
-  useEffect(() => {
+  // 添加初始化方法
+  const initializePage = async () => {
     if (!isVPNActive) {
       message.error('VPN未启动');
       return;
     }
-    const fetchServices = () => {
-      setLoading(true);
-
-      GetServices().then((services) => {
-        services.sort((a, b) => a.Namespace.localeCompare(b.Namespace));
-        setInitNsServices(services);
-        setNsServices(services);
-      }).catch(() => {
-          message.error('获取服务失败');
+    setLoading(true);
+    try {
+      // 获取命名空间列表
+      const nsList = await GetNamespaces();
+      const filteredNamespaces = nsList.filter((ns) => ns.indexOf("kube") < 0).map((ns) => {
+        return {
+          label: ns,
+          value: ns,
+        };
       });
-      setLoading(false);
-    };
+      setNamespaces(filteredNamespaces);
 
-    fetchServices();
+      // 设置默认过滤的命名空间
+      const defaultFilerNs = ["default"];
+      if (nsList.includes("platform")) {
+        defaultFilerNs.push("platform");
+      }
+      setFilterNamespaces(defaultFilerNs);
+      // 获取服务列表
+      const services = await GetServices();
+      const filteredServices = services
+      .filter((service) => defaultFilerNs.includes(service.Namespace))
+      .sort((a, b) => a.Namespace.localeCompare(b.Namespace));
+      setInitNsServices(filteredServices);
+    } catch (error) {
+      message.error('初始化失败' + error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 初始化页面
+  useEffect(() => {
+    initializePage();
   }, [isVPNActive]);
+
+  const filterServices = async () => {
+    // 获取服务列表
+    const services = await GetServices();
+    const filteredServices = services
+      .filter((service) => filterNamespaces.includes(service.Namespace))
+      .sort((a, b) => a.Namespace.localeCompare(b.Namespace));
+    setNsServices(filteredServices);
+  };
+
+  // 命名空间变化时重新获取服务
+  useEffect(() => {
+    filterServices();
+  }, [filterNamespaces]);
+
+  // 修改刷新按钮的点击事件处理
+  const handleRefresh = async () => {
+    setLoading(true);
+    try {
+      const services = await GetServices();
+      const filteredServices = services
+        .filter((service) => filterNamespaces.includes(service.Namespace))
+        .sort((a, b) => a.Namespace.localeCompare(b.Namespace));
+
+      setInitNsServices(filteredServices);
+      setNsServices(filteredServices);
+      message.success('刷新成功');
+    } catch (error) {
+      message.error('获取服务失败' + error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -50,6 +107,11 @@ const Services: React.FC = () => {
     ClipboardSetText(text).then(() => {
       message.success("复制成功:" + text);
     });
+  }
+
+  function ChangeFilterNS(nsList: string[]) {
+    setFilterNamespaces(nsList);
+    handleRefresh();
   }
 
   function ServiceTitleEle(ns: string, service: main.AppService) {
@@ -109,16 +171,15 @@ const Services: React.FC = () => {
     <Layout style={{ height: '100vh', overflow: 'hidden' }}>
       <Header
         style={{
-          padding: '0 24px',
+          padding: '0 24px 8px 24px',
           background: '#fff',
           display: 'flex',
-          alignItems: 'center',
-          height: '56px',
+          flexDirection: 'column',
           boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+          height: 'fit-content'
         }}
-      // 在 Header 组件内部修改为
       >
-        <Space>
+        <div>
           <Input
             placeholder="搜索服务..."
             allowClear
@@ -134,30 +195,28 @@ const Services: React.FC = () => {
             style={{
               border: 'none'
             }}
-            onClick={() => {
-              setLoading(true);
-              GetServices()
-                .then((services) => {
-                  services.sort((a, b) => a.Namespace.localeCompare(b.Namespace));
-                  setInitNsServices(services);
-                  setNsServices(services);
-                  message.success('刷新成功');
-                })
-                .catch(() => {
-                  message.error('获取服务失败');
-                })
-                .finally(() => {
-                  setLoading(false);
-                });
-            }}
+            onClick={handleRefresh}
           />
-        </Space>
+        </div>
+        <Row>
+          <Col flex="80px"><span>项目空间:</span></Col>
+          <Col flex="auto">
+            <Select
+              mode="multiple"
+              defaultValue={filterNamespaces}
+              onChange={values => ChangeFilterNS(values)}
+              options={namespaces}
+              style={{ width: '100%' }}
+              maxTagCount="responsive"
+            />
+          </Col>
+        </Row>
       </Header>
       <Content
         style={{
           padding: '16px',
           overflow: 'auto',
-          height: 'calc(100vh - 56px)',
+          height: 'calc(100vh - var(--header-height, 0px))',
         }}
       >
         <Row gutter={[16, 16]}>

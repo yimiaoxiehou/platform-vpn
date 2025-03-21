@@ -5,6 +5,8 @@ import {main} from '../models';
 
 export function GetLogs():Promise<Array<log.LogItem>>;
 
+export function GetNamespaces():Promise<Array<string>>;
+
 export function GetServices():Promise<Array<main.AppNsService>>;
 
 export function OpenHosts():Promise<void>;

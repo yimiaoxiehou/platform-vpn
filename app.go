@@ -133,6 +133,14 @@ func (a *App) GetServices() ([]AppNsService, error) {
 	return servicess, nil
 }
 
+func (a *App) GetNamespaces() ([]string, error) {
+	nodes, err := k3s.GetNamespaces()
+	if err != nil {
+		return nil, err
+	}
+	return nodes, nil
+}
+
 func (a *App) GetLogs() ([]*log.LogItem, error) {
 	return log.GetLogs(), nil
 }

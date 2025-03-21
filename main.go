@@ -49,6 +49,7 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
+		Debug:            options.Debug{OpenInspectorOnStartup: true},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
@@ -57,7 +58,7 @@ func main() {
 
 		LogLevel:           logger.INFO,
 		LogLevelProduction: logger.INFO,
-		DisableResize:      true,
+		DisableResize:      false,
 	})
 
 	if err != nil {
