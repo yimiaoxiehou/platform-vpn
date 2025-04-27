@@ -18,6 +18,7 @@ build:
     # 构建 Windows AMD64 版本，启用 gvisor 和调试模式
     - wails build -platform linux/amd64 -tags with_gvisor -o platform-vpn-linux64-$TAG
     - wails build -platform windows/amd64 -tags with_gvisor -o platform-vpn-win64-$TAG.exe
+    - GOOS=linux GOARCH=amd64 go build -tags with_gvisor -o build/bin/platform-vpn-cli-linux64-$TAG ./cli
   artifacts:
     name: platform-vpn
     paths:
