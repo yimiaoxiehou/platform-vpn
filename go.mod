@@ -18,6 +18,7 @@ require (
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
 	github.com/metacubex/mihomo v1.19.2
 	github.com/showa-93/go-mask v0.6.2
+	github.com/sirupsen/logrus v1.9.3
 	github.com/wailsapp/wails/v2 v2.10.1
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.32.0
@@ -132,7 +133,6 @@ require (
 	github.com/sina-ghaderi/poly1305 v0.0.0-20220724002748-c5926b03988b // indirect
 	github.com/sina-ghaderi/rabaead v0.0.0-20220730151906-ab6e06b96e8c // indirect
 	github.com/sina-ghaderi/rabbitio v0.0.0-20220730151941-9ce26f4f872e // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.8 // indirect

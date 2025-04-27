@@ -18,6 +18,7 @@ import (
 	mlog "github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/rules"
 	"github.com/showa-93/go-mask"
+	logrus "github.com/sirupsen/logrus"
 )
 
 var k3sClinet *k3s.Client
@@ -88,6 +89,8 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 	clashConfig.DNS.Enable = false
 	clashConfig.Rules = AddIPCIDRRule(routeCidrs)
 	clashConfig.Proxies = proxies
+	// 设置日志输出到文件
+	logrus.SetOutput(log.NewLogger())
 	executor.ApplyConfig(clashConfig, true)
 	// 首次立即执行一次
 	UpdateHosts()

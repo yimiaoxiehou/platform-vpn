@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GetLogs } from '../../wailsjs/go/main/App';
 import './log.css';
+
 const Log = () => {
   const [logs, setLogs] = useState<string>('');
 
@@ -21,13 +22,17 @@ const Log = () => {
           return `${formattedTime} ${item.Level} ${item.Message}`;
         }).join('\n');
         setLogs(formattedLogs);
-        console.log(formattedLogs);
       } catch (error) {
         console.error('获取日志失败:', error);
       }
     };
 
+    // 首次立即执行
     fetchLogs();
+    // 设置定时器，每3秒更新一次日志
+    const timer = setInterval(fetchLogs, 1000);
+    // 组件卸载时清理定时器
+    return () => clearInterval(timer);
   }, []);
 
   return (
