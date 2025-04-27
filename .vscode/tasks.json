@@ -7,12 +7,14 @@
         "options": {
           "cwd": "${workspaceFolder}",
           "env": {
+            "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
             "CGO_ENABLED": "1"
           }
         },
         "osx": {
           "options": {
             "env": {
+              "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
               "CGO_CFLAGS": "-mmacosx-version-min=10.13",
               "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
             }
@@ -21,6 +23,7 @@
         "windows": {
           "options": {
             "env": {
+              "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
               "CGO_ENABLED": "0"
             }
           }
@@ -48,6 +51,7 @@
         "osx": {
           "options": {
             "env": {
+              "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
               "CGO_CFLAGS": "-mmacosx-version-min=10.13",
               "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
             }
@@ -83,6 +87,7 @@
         "osx": {
           "options": {
             "env": {
+              "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
               "CGO_CFLAGS": "-mmacosx-version-min=10.13",
               "CGO_LDFLAGS": "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
             }

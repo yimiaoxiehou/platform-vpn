@@ -15,6 +15,7 @@ import (
 	c "github.com/metacubex/mihomo/config"
 	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/hub/executor"
+	mlog "github.com/metacubex/mihomo/log"
 	"github.com/metacubex/mihomo/rules"
 	"github.com/showa-93/go-mask"
 )
@@ -50,7 +51,9 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 	if err != nil {
 		return err
 	}
-
+	for _, addr := range routeCidrs {
+		log.Info(fmt.Sprintf("路由地址: %s", addr))
+	}
 	proxies := make(map[string]C.Proxy)
 	sshProxy, _ := outbound.NewSsh(outbound.SshOption{
 		Server:   host,
@@ -63,11 +66,14 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 
 	clashRawConfig := c.DefaultRawConfig()
 	clashConfig, _ := c.ParseRawConfig(clashRawConfig)
+	clashConfig.General.LogLevel = mlog.DEBUG
 	clashConfig.General.SocksPort = 37890
 	clashConfig.General.IPv6 = false
 	clashConfig.General.Tun.Enable = true
 	clashConfig.General.Tun.DNSHijack = []string{}
-	clashConfig.General.Tun.Device = "platform-vpn"
+	clashConfig.General.Tun.Device = "utun8"
+	clashConfig.General.Tun.StrictRoute = true
+	clashConfig.General.Tun.MTU = 1400
 	clashConfig.General.Tun.Inet4Address = []netip.Prefix{
 		netip.PrefixFrom(netip.MustParseAddr("10.10.0.1"), 30),
 	}

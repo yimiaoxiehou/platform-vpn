@@ -32,7 +32,9 @@
         "preLaunchTask": "build debug",
         "console": "integratedTerminal",
         "cwd": "${workspaceFolder}",
-        
+        "env": {
+          "GOROOT": "/Users/yimiao/.version-fox/cache/golang/current",
+        }
       },
       {
         "name": "Wails: Dev platform-vpn",
