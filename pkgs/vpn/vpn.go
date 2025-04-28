@@ -56,11 +56,20 @@ func StartVPN(user string, password string, host string, port int, refreshInterv
 		log.Info(fmt.Sprintf("路由地址: %s", addr))
 	}
 	proxies := make(map[string]C.Proxy)
+	iface, err := utils.DetechRouteInterface(host, string(port))
+	if err != nil {
+		log.Error(fmt.Sprintf("检测路由接口失败: %v", err))
+	} else {
+		log.Info(fmt.Sprintf("通过 %s 连接 %s %d", iface.Name, host, port))
+	}
 	sshProxy, _ := outbound.NewSsh(outbound.SshOption{
 		Server:   host,
 		Port:     port,
 		UserName: user,
 		Password: password,
+		BasicOption: outbound.BasicOption{
+			Interface: iface.Name,
+		},
 	})
 	proxies["DIRECT"] = adapter.NewProxy(outbound.NewDirect())
 	proxies["PROXY"] = adapter.NewProxy(sshProxy)
