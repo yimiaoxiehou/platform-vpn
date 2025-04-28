@@ -87,7 +87,7 @@ const App: React.FC = () => {
             }}
           />
         </div>
-       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: 1.2.5<br/>2025-04-27 15:01:08</span>
+       <span style={{color: '#dfe4ea', fontWeight: 'bold'}}>version: 1.2.5<br/>2025-04-28 16:34:38</span>
       </Sider>
       <Layout style={{ marginLeft: 200 }} >
         <Content
