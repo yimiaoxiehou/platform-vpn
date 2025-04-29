@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"platform-vpn/pkgs/log"
 	"platform-vpn/pkgs/vpn"
 	"strconv"
 	"strings"
@@ -65,11 +66,11 @@ func main() {
 	// 使用输入的用户名、密码和服务器进行 VPN 连接
 	err = vpn.StartVPN(username, password, server, portInt, 1*time.Minute, 0)
 	if err != nil {
-		fmt.Printf("连接 VPN 服务器[%s]失败: %v\n", server, err)
+		log.Error(fmt.Sprintf("连接 VPN 服务器[%s]失败: %v\n", server, err))
 		return
 	}
 
-	fmt.Printf("连接 VPN 服务器[%s]成功。\n", server)
+	log.Info(fmt.Sprintf("连接 VPN 服务器[%s]成功。\n", server))
 
 	// 添加信号处理
 	sigChan := make(chan os.Signal, 1)

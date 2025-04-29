@@ -140,7 +140,7 @@ func (c *Client) GetServiceHosts() (string, error) {
 		return "", err
 	}
 
-	k8sHosts := utils.HOST_START
+	k8sHosts := utils.HostsBlockStart
 
 	nsHosts := make(map[string]map[string]string)
 	for ns, svcs := range nsSvcs {
@@ -177,7 +177,7 @@ func (c *Client) GetServiceHosts() (string, error) {
 		k8sHosts += fmt.Sprintf("%s\t%s\n", host, name)
 	}
 
-	k8sHosts = k8sHosts + utils.HOST_END
+	k8sHosts = k8sHosts + utils.HostsBlockEnd
 	return k8sHosts, nil
 }
 
